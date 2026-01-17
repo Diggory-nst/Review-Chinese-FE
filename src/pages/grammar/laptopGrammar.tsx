@@ -1,15 +1,10 @@
+// import 'react-quill/dist/quill.snow.css';
+import 'quill/dist/quill.snow.css';
 
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import {
-    ClassicEditor, Bold, Essentials, Italic, Mention, Paragraph,
-    Undo, Alignment, FontColor, FontSize, Table, TableToolbar
-} from 'ckeditor5';
-import 'ckeditor5/ckeditor5.css';
-
-import { Div } from '../assets/styles/grammar'
+import { Div } from '../../assets/styles/grammar/laptopGrammar'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import configDomain from '../configs/config.domain';
+import configDomain from '../../configs/config.domain';
 import axios from 'axios'
 
 interface TypeDataBook {
@@ -23,7 +18,7 @@ interface TypeDataBook {
     }>
 }
 
-const Grammar = () => {
+const LaptopGrammar = () => {
 
     const domain = configDomain?.domain
 
@@ -56,7 +51,7 @@ const Grammar = () => {
             const url = `${domain}/general/getDataBook`
 
             try {
-                const res = await axios.get(url)
+                const res = await axios.get(url, { params: { section: 'grammar' } })
                 const data = res.data.metadata
 
                 setDataBook(data)
@@ -113,7 +108,6 @@ const Grammar = () => {
                 </div>
             </div>
             <div className="main-content">
-                {/* Import CKeditor 5 */}
                 {!choiceBook ?
                     <div className="notChoiceLesson">
                         {isError ?
@@ -123,29 +117,9 @@ const Grammar = () => {
                         }
                     </div>
                     :
-                    <CKEditor
-                        editor={ClassicEditor}
-                        config={
-                            {
-                                toolbar: {
-                                    items: ['undo', 'redo', '|', 'bold', 'italic', '|', 'alignment', 'fontColor', 'fontSize', 'insertTable']
-                                },
-                                plugins: [
-                                    Bold, Essentials, Italic, Mention, Paragraph, Undo, Alignment, FontColor, Table, TableToolbar, FontSize
-                                ],
-                                table: {
-                                    contentToolbar: ['tableColumn', 'tableRow']
-                                },
-                                fontSize: {
-                                    options: [18, 20, 22]
-                                }
-                            }
-                        }
-                        onReady={(editor) => {
-                            editorRef.current = editor
-                            editor.enableReadOnlyMode('readOnly')
-                            setIsEditorReady(true)
-                        }}
+                    <div
+                        className="ql-snow"
+                        dangerouslySetInnerHTML={{ __html: contentGrammar }}
                     />
                 }
             </div>
@@ -153,4 +127,4 @@ const Grammar = () => {
     )
 }
 
-export default Grammar
+export default LaptopGrammar;

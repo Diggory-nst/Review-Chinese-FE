@@ -1,18 +1,18 @@
 // phrases = ['đến', 'đúng vậy', 'đúng vậy', 'uống'];
 
 const findWordDuplicates = (phrasesArray: string[]) => {
-    const wordFrequency: { [key: string]: number } = {};
+    const seen = new Set<string>();
+    const duplicates = new Set<string>();
 
-    for (let phrase of phrasesArray) {
-        if (wordFrequency[phrase]) {
-            wordFrequency[phrase]++;
+    for (const phrase of phrasesArray) {
+        if (seen.has(phrase)) {
+            duplicates.add(phrase);
         } else {
-            wordFrequency[phrase] = 1;
+            seen.add(phrase);
         }
     }
 
-    const duplicates = Object.keys(wordFrequency).filter(word => wordFrequency[word] > 1);
-    return duplicates;
+    return [...duplicates];
 };
 
 export default findWordDuplicates;

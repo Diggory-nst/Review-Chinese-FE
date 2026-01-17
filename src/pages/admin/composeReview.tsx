@@ -40,9 +40,23 @@ const ComposeReview = () => {
         const urlSubmit = `${domain}/admin/createComposeReview`
         try {
             const res = await axios.post(urlGet, choiceBook, { headers })
-            const { tuonghinh, meaning } = res.data.metadata
+            const rawData = res.data.metadata
 
-            const arrCompose = composeAutoFunc({ tuonghinh, meaning })
+            let tuonghinh: Array<string> = []
+            let pinyin: Array<string> = []
+            let audio: Array<string> = []
+            let type: Array<string> = []
+            let meaning: Array<string> = []
+
+            rawData.map((item: any) => {
+                tuonghinh.push(item.tuonghinh)
+                pinyin.push(item.pinyin)
+                type.push(item.type)
+                audio.push(item.audio)
+                meaning.push(item.meaning)
+            })
+
+            const arrCompose = composeAutoFunc({ tuonghinh, pinyin, type, audio, meaning })
             const dataSubmit = {
                 choiceBook,
                 arrCompose

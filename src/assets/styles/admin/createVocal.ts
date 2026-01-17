@@ -94,6 +94,14 @@ const Div = styled.div`
         #icon-remove-item-vocal:hover {
             color: #bf2c24;
         }
+
+        .typeInput {
+            width: 130px;
+        }
+
+        .meaningInput {
+            width: 200px;
+        }
     }
 
     .tag-area {

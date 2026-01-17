@@ -1,30 +1,31 @@
 
-import img3 from '../assets/img/anime3.jpg'
-import img4 from '../assets/img/anime4.jpg'
-import img5 from '../assets/img/anime5.jpg'
-import img6 from '../assets/img/anime6.jpg'
-import img7 from '../assets/img/anime7.jpg'
-import img8 from '../assets/img/anime8.jpg'
-import img9 from '../assets/img/anime9.jpg'
-import img10 from '../assets/img/anime10.jpg'
-import img11 from '../assets/img/anime11.jpg'
-import img12 from '../assets/img/anime12.jpg'
-import img13 from '../assets/img/anime13.jpg'
-import img14 from '../assets/img/anime14.jpg'
-import img15 from '../assets/img/anime15.jpg'
-import img16 from '../assets/img/anime16.jpg'
-import img17 from '../assets/img/anime17.jpg'
-import img18 from '../assets/img/anime18.jpg'
-import img19 from '../assets/img/anime19.jpg'
-import img20 from '../assets/img/anime20.jpg'
-import img21 from '../assets/img/anime21.jpg'
-import img22 from '../assets/img/anime22.jpg'
+import img3 from '../../assets/img/anime3.jpg'
+import img4 from '../../assets/img/anime4.jpg'
+import img5 from '../../assets/img/anime5.jpg'
+import img6 from '../../assets/img/anime6.jpg'
+import img7 from '../../assets/img/anime7.jpg'
+import img8 from '../../assets/img/anime8.jpg'
+import img9 from '../../assets/img/anime9.jpg'
+import img10 from '../../assets/img/anime10.jpg'
+import img11 from '../../assets/img/anime11.jpg'
+import img12 from '../../assets/img/anime12.jpg'
+import img13 from '../../assets/img/anime13.jpg'
+import img14 from '../../assets/img/anime14.jpg'
+import img15 from '../../assets/img/anime15.jpg'
+import img16 from '../../assets/img/anime16.jpg'
+import img17 from '../../assets/img/anime17.jpg'
+import img18 from '../../assets/img/anime18.jpg'
+import img19 from '../../assets/img/anime19.jpg'
+import img20 from '../../assets/img/anime20.jpg'
+import img21 from '../../assets/img/anime21.jpg'
+import img22 from '../../assets/img/anime22.jpg'
 
-import { Div } from '../assets/styles/review'
+import { Div } from '../../assets/styles/review/laptopReview'
 import { useCallback, useEffect, useState } from 'react'
 
-import configDomain from '../configs/config.domain';
+import configDomain from '../../configs/config.domain';
 import axios from 'axios'
+import IonIcon from '@reacticons/ionicons'
 
 const images: string[] = [img3, img4, img5, img6, img7, img8, img9, img10, img11, img12, img13, img14, img15, img16, img17, img18, img19, img20, img21, img22]
 
@@ -42,6 +43,8 @@ interface TypeDataBook {
 interface TypeReview {
     tuonghinh: string,
     pinyin: string,
+    type: string,
+    audio: string,
     meaning: Array<string>,
     result: string
 }
@@ -55,7 +58,7 @@ const getDailyImage = (): string => {
     return images[dayOfYear % images.length];
 };
 
-const Review = () => {
+const LaptopReview = () => {
 
     const domain = configDomain?.domain
 
@@ -71,6 +74,8 @@ const Review = () => {
     const [dataReview, setDataReview] = useState<TypeReview[]>([{
         tuonghinh: '',
         pinyin: '',
+        type: '',
+        audio: '',
         meaning: [],
         result: ''
     }])
@@ -93,7 +98,7 @@ const Review = () => {
             const url = `${domain}/general/getDataBook`
 
             try {
-                const res = await axios.get(url)
+                const res = await axios.get(url, { params: { section: 'review' } })
                 const data = res.data.metadata
 
                 setDataBook(data)
@@ -122,10 +127,13 @@ const Review = () => {
         try {
             const res = await axios.post(url, { idBook, idLesson })
             const data = res.data.metadata
+            console.log(data)
             const newData = data.map((item: TypeReview) => {
                 return {
                     tuonghinh: item.tuonghinh,
                     pinyin: item.pinyin,
+                    type: item.type,
+                    audio: item.audio,
                     meaning: sortMeaning(item.meaning),
                     result: item.result
                 }
@@ -166,6 +174,12 @@ const Review = () => {
         }
     }
 
+    // Listen Audio
+    const playAudio = (pathAudio: string) => {
+        const urlAudio = `${domain}/audio/${pathAudio}`
+        new Audio(urlAudio).play()
+    }
+
     return (
         <Div className="container">
             <div className="table-of-content">
@@ -200,6 +214,11 @@ const Review = () => {
                         <div className="main-word">
                             <h1 className="tuong-hinh">{dataReview[indexReview].tuonghinh}</h1>
                         </div>
+                        <div className="inforMainWorld">
+                            <h1 id='type'>( {dataReview[indexReview].type} )</h1>
+                            <h1>{dataReview[indexReview].pinyin}</h1>
+                            <IonIcon name="volume-high-outline" id='iconAudio' onClick={() => playAudio(dataReview[indexReview].audio)}></IonIcon>
+                        </div>
                         <div className="list-means-word">
                             <h1 className="item-means-word" onClick={() => checkResult(dataReview[indexReview].meaning[0])}>{dataReview[indexReview].meaning[0]}</h1>
                             <h1 className="item-means-word" onClick={() => checkResult(dataReview[indexReview].meaning[1])}>{dataReview[indexReview].meaning[1]}</h1>
@@ -216,4 +235,4 @@ const Review = () => {
     )
 }
 
-export default Review
+export default LaptopReview

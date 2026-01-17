@@ -10,10 +10,10 @@ import { useState, useRef, useEffect } from "react";
 interface FormAddItem {
     tuonghinh: string,
     pinyin: string,
+    type: string,
     meaning: string,
     audio: any,
-    example: string,
-    structureChinese: string
+    example: string
 }
 
 interface ChoiceBook {
@@ -34,10 +34,10 @@ const CreateVocal = () => {
     const [arrItemVocal, setArrayItemVocal] = useState<FormAddItem[]>([{
         tuonghinh: '',
         pinyin: '',
+        type: '',
         meaning: '',
         audio: null,
-        example: '',
-        structureChinese: ''
+        example: ''
     }])
 
     const [choiceBook, setChoiceBook] = useState<ChoiceBook>({
@@ -55,10 +55,10 @@ const CreateVocal = () => {
         const newItemVocal = {
             tuonghinh: '',
             pinyin: '',
+            type: '',
             meaning: '',
             audio: null,
             example: '',
-            structureChinese: ''
         }
         setArrayItemVocal(prev => [...prev, newItemVocal])
     }
@@ -104,18 +104,23 @@ const CreateVocal = () => {
         formData.append('book', choiceBook.book);
         formData.append('lesson', choiceBook.lesson);
 
-        arrItemVocal.forEach(elm => {
-            formData.append('tuonghinh', elm.tuonghinh);
-            formData.append('pinyin', elm.pinyin);
-            formData.append('meaning', elm.meaning);
-            formData.append('example', elm.example);
-            formData.append('structureChinese', elm.structureChinese);
+        arrItemVocal.forEach((elm, index) => {
+            formData.append(`vocals[${index}][tuonghinh]`, elm.tuonghinh);
+            formData.append(`vocals[${index}][pinyin]`, elm.pinyin);
+            formData.append(`vocals[${index}][type]`, elm.type);
+            formData.append(`vocals[${index}][meaning]`, elm.meaning);
+            formData.append(`vocals[${index}][example]`, elm.example);
         })
 
         for (let i = 0; i < arrAudio.length; i++) {
-            const fileName = encodeURIComponent(arrAudio[i].name); // Encode filename in UTF-8
+
+            if (arrAudio[i] == null) {
+                formData.append("audio", new Blob(), "emptyfile");
+            } else {
+                const fileName = encodeURIComponent(arrAudio[i].name); // Encode filename in UTF-8
+                formData.append("audio", arrAudio[i], fileName);
+            }
             // Append the file with the properly encoded filename
-            formData.append("audio", arrAudio[i], fileName);
         }
 
         try {
@@ -133,13 +138,16 @@ const CreateVocal = () => {
             setArrayItemVocal([{
                 tuonghinh: '',
                 pinyin: '',
+                type: '',
                 meaning: '',
                 audio: null,
-                example: '',
-                structureChinese: ''
+                example: ''
             }])
+
             if (!tagAudioRef.current) return
+
             tagAudioRef.current.value = ''
+
         } catch (error: any) {
             setIsError(true);
             setMessageError(error.response.data.message)
@@ -172,32 +180,6 @@ const CreateVocal = () => {
                 }
             }
         }
-
-        // Bản gốc
-
-        // if (e.key === 'ArrowUp') { // move up
-        //     while (temp > 0) {
-        //         temp -= 1;
-        //         const input = itemRef.current.querySelectorAll('.navigate')[temp].querySelector<HTMLInputElement>(`input[name="${section}"], textarea[name="${section}"]`)
-        //         if (input) {
-        //             setActive(temp);
-        //             input.focus();
-        //             input.select();
-        //             break;
-        //         }
-        //     }
-        // } else if (e.key === 'ArrowDown') { // move down
-        //     while (temp < columns - 1) {
-        //         temp += 1;
-        //         const input = itemRef.current.querySelectorAll('.navigate')[temp].querySelector<HTMLInputElement>(`input[name="${section}"], textarea[name="${section}"]`)
-        //         if (input) {
-        //             setActive(temp);
-        //             input.focus();
-        //             input.select();
-        //             break;
-        //         }
-        //     }
-        // }
     };
 
     useEffect(() => {
@@ -253,6 +235,7 @@ const CreateVocal = () => {
                                         name="tuonghinh"
                                         onChange={handleInputChange}
                                         onClick={handleNavigateClick('tuonghinh')}
+                                        autoComplete="off"
                                     />
                                     <input
                                         type="text"
@@ -261,14 +244,27 @@ const CreateVocal = () => {
                                         name="pinyin"
                                         onChange={handleInputChange}
                                         onClick={handleNavigateClick('pinyin')}
+                                        autoComplete="off"
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="Loại Từ"
+                                        value={item.type}
+                                        name="type"
+                                        className="typeInput"
+                                        onChange={handleInputChange}
+                                        onClick={handleNavigateClick('type')}
+                                        autoComplete="off"
                                     />
                                     <input
                                         type="text"
                                         placeholder="Nghĩa"
                                         value={item.meaning}
                                         name="meaning"
+                                        className="meaningInput"
                                         onChange={handleInputChange}
                                         onClick={handleNavigateClick('meaning')}
+                                        autoComplete="off"
                                     />
                                     <input
                                         type="file"
@@ -288,13 +284,6 @@ const CreateVocal = () => {
                                         name="example"
                                         onChange={handleInputChange}
                                         onClick={handleNavigateClick('example')}
-                                    />
-                                    <textarea
-                                        placeholder="Cấu Tạo Từ"
-                                        value={item.structureChinese}
-                                        name="structureChinese"
-                                        onChange={handleInputChange}
-                                        onClick={handleNavigateClick('structureChinese')}
                                     />
                                 </div>
                             </div>

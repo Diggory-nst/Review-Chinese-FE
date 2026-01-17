@@ -20,27 +20,33 @@ const Div = styled.footer`
     }
 
     // Responsive for mobile
-    @media (max-width: 575px) {
+    @media (max-width: 768px) {
 
-        margin-top: 20px;
+        margin-top: 18px;
+        margin-bottom: 0px;
+        background-color: #3c3c3c;
         
 
         .support {
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            padding: 10px 0;
 
             .info-support {
-                margin-bottom: 12px;
-            }
-
-            .link-facebook {
-                margin-bottom: 12px;
+                display: none;
             }
 
             .copyright {
                 h1 {
                     margin-bottom: 0;
                 }
+            }
+
+            h1, a{
+                color: white;
+                font-size: 1.8rem;
+                line-height: 2.2rem;
             }
         }
     }

@@ -115,16 +115,65 @@ const Div = styled.div`
         height: calc(100% - 138px);
     }
 
-    .ck.ck-editor {
+    .quill {
+        height: calc(100% - 41.6px);
+    }
+
+    .ql-editor {
         height: 100%;
     }
 
-    .ck .ck-editor__main {
-        height: calc(100% - 40px);
+    .ql-font-size.ql-picker{
+        width: 98px;
     }
 
-    .ck-editor__editable_inline {
-        height: 100%;
+
+    /* ---- Default styles (cho mobile) ---- */
+    .ql-font-size-normal {
+        font-size: 16px; /* Kích thước bạn muốn cho mobile */
+    }
+    .ql-font-size-large {
+        font-size: 18px;
+    }
+    .ql-font-size-huge {
+        font-size: 20px;
+    }
+
+
+    /* ---- Styles cho màn hình lớn hơn (laptop) ---- */
+    /* Áp dụng khi chiều rộng màn hình từ 1024px trở lên */
+    @media (min-width: 1024px) {
+        .ql-font-size-normal {
+            font-size: 24px; /* Kích thước bạn muốn cho laptop */
+        }
+        .ql-font-size-large {
+            font-size: 26px;
+        }
+        .ql-font-size-huge {
+            font-size: 28px;
+        }
+    }
+
+    /* Gán nhãn cho các item trong dropdown */
+    .ql-snow .ql-picker.ql-font-size .ql-picker-item[data-value="normal"]::before {
+    content: 'Normal';
+    }
+    .ql-snow .ql-picker.ql-font-size .ql-picker-item[data-value="large"]::before {
+    content: 'Large';
+    }
+    .ql-snow .ql-picker.ql-font-size .ql-picker-item[data-value="huge"]::before {
+    content: 'Huge';
+    }
+
+    /* Gán nhãn cho nút hiển thị giá trị hiện tại */
+    .ql-snow .ql-picker.ql-font-size .ql-picker-label[data-value="normal"]::before {
+    content: 'Normal';
+    }
+    .ql-snow .ql-picker.ql-font-size .ql-picker-label[data-value="large"]::before {
+    content: 'Large';
+    }
+    .ql-snow .ql-picker.ql-font-size .ql-picker-label[data-value="huge"]::before {
+    content: 'Huge';
     }
 `
 

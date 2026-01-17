@@ -14,22 +14,18 @@ interface ChoiceBook {
 
 interface InforVocal {
     _id: string,
-    tuonghinh: Array<string>,
-    pinyin: Array<string>,
-    meaning: Array<string>,
-    audio: Array<string>,
-    example: Array<string>,
-    structureChinese: Array<string>
-}
-
-interface FormUpdateItemVocal {
     tuonghinh: string,
     pinyin: string,
     meaning: string,
+    audio: string,
+    example: string
+}
+
+interface FormUpdateItemVocal {
+    pinyin: string,
+    meaning: string,
     audio: any,
-    example: string,
-    indexItemVocal: string,
-    structureChinese: string
+    example: string
 }
 
 const EditVocal = () => {
@@ -46,26 +42,16 @@ const EditVocal = () => {
         lesson: ''
     })
 
-    const [inforVocal, setInforVocal] = useState<InforVocal>({
-        _id: '',
-        tuonghinh: [],
-        pinyin: [],
-        meaning: [],
-        audio: [],
-        example: [],
-        structureChinese: []
-    })
+    const [inforVocal, setInforVocal] = useState<InforVocal[]>([])
+    const [indexVocalEdit, setIndexVocalEdit] = useState<number>(0)
 
     const [openPopup, setOpenPopup] = useState<boolean>(false)
 
     const [updateItemVocal, setUpdateItemVocal] = useState<FormUpdateItemVocal>({
-        tuonghinh: '',
         pinyin: '',
         meaning: '',
         audio: null,
-        indexItemVocal: '',
-        example: '',
-        structureChinese: ''
+        example: ''
     })
 
     const tagAudioRef = useRef<HTMLInputElement | null>(null)
@@ -77,6 +63,23 @@ const EditVocal = () => {
     }
 
     // Get All Information Vocabulary
+
+    const getAllinformationVocal = async () => {
+
+        const url = `${domain}/admin/getAllInforVocal`
+
+        try {
+            const res = await axios.post(url, choiceBook, { headers })
+            const data = res.data.metadata
+
+            setCompleteChoiceBook(true)
+            setInforVocal(data)
+        } catch (error: any) {
+            setIsError(true)
+            setMessageError(error.response.data.message)
+        }
+    }
+
     const handleSubmitChoiceBook = () => {
 
         if (choiceBook.book == '' || choiceBook.lesson == '') {
@@ -87,36 +90,12 @@ const EditVocal = () => {
             setIsError(false)
         }
 
-        const getAllinformationVocal = async () => {
-
-            const url = `${domain}/admin/getAllInforVocal`
-
-            try {
-                const res = await axios.post(url, choiceBook, { headers })
-                const data = res.data.metadata
-
-                setCompleteChoiceBook(true)
-                setInforVocal(data)
-            } catch (error: any) {
-                setIsError(true)
-                setMessageError(error.response.data.message)
-            }
-        }
-
         getAllinformationVocal()
     }
 
     const handleOpenPopupEdit = (index: number) => {
         setOpenPopup(true)
-        setUpdateItemVocal({
-            tuonghinh: inforVocal.tuonghinh[index],
-            pinyin: inforVocal.pinyin[index],
-            meaning: inforVocal.meaning[index],
-            audio: null,
-            indexItemVocal: index.toString(),
-            example: inforVocal.example[index],
-            structureChinese: inforVocal.structureChinese[index]
-        })
+        setIndexVocalEdit(index)
     }
 
     const handleClosePopup = () => {
@@ -135,18 +114,27 @@ const EditVocal = () => {
         })
     }
 
+    const compareVocal = (a: string, b: string): boolean => {
+        return a !== b ? true : false
+    }
+
     const submitUpdate = async () => {
 
         const url = `${domain}/admin/updateVocabulary`
-
         const formData = new FormData()
-        formData.append('_id', inforVocal._id);
-        formData.append('pinyin', updateItemVocal.pinyin);
-        formData.append('meaning', updateItemVocal.meaning);
-        formData.append('indexItemVocal', updateItemVocal.indexItemVocal);
+
+        formData.append('_id', inforVocal[indexVocalEdit]._id);
         formData.append('audio', updateItemVocal.audio);
-        formData.append('example', updateItemVocal.example);
-        formData.append('structureChinese', updateItemVocal.structureChinese);
+
+        if (compareVocal(updateItemVocal.pinyin, inforVocal[indexVocalEdit].pinyin)) {
+            formData.append('pinyin', updateItemVocal.pinyin);
+        }
+        if (compareVocal(updateItemVocal.meaning, inforVocal[indexVocalEdit].meaning)) {
+            formData.append('meaning', updateItemVocal.meaning);
+        }
+        if (compareVocal(updateItemVocal.example, inforVocal[indexVocalEdit].example)) {
+            formData.append('example', updateItemVocal.example);
+        }
 
         try {
             await axios.patch(url, formData, {
@@ -168,31 +156,11 @@ const EditVocal = () => {
     const deleteElementVocabulary = async () => {
 
         const url = `${domain}/admin/deleteElementVocabulary`
-        const indexItemVocal = Number(updateItemVocal.indexItemVocal)
-        const data = {
-            _id: inforVocal._id,
-            indexItemVocal: updateItemVocal.indexItemVocal
-        }
 
         try {
-            await axios.post(url, data, { headers })
+            await axios.post(url, { _id: inforVocal[indexVocalEdit]._id }, { headers })
             setOpenPopup(false)
-
-            const newArrTuonghinh = inforVocal.tuonghinh.filter((_elm, index) => index != indexItemVocal)
-            const newArrPinyin = inforVocal.pinyin.filter((_elm, index) => index != indexItemVocal)
-            const newArrMeaning = inforVocal.meaning.filter((_elm, index) => index != indexItemVocal)
-            const newArrAudio = inforVocal.audio.filter((_elm, index) => index != indexItemVocal)
-            const newArrExample = inforVocal.example.filter((_elm, index) => index != indexItemVocal)
-            const newArrStructureChinese = inforVocal.structureChinese.filter((_elm, index) => index != indexItemVocal)
-            setInforVocal({
-                _id: inforVocal._id,
-                tuonghinh: newArrTuonghinh,
-                pinyin: newArrPinyin,
-                meaning: newArrMeaning,
-                audio: newArrAudio,
-                example: newArrExample,
-                structureChinese: newArrStructureChinese
-            })
+            getAllinformationVocal()
         } catch (error: any) {
             setIsError(true)
             setMessageError(error.response.data.message)
@@ -238,18 +206,18 @@ const EditVocal = () => {
                         </div>
                     </div>
                     <div className="list-volca">
-                        {inforVocal.tuonghinh.length === 0 ?
+                        {inforVocal.length === 0 ?
                             (<p className="emptyVocal">Không Có Từ Vựng</p>)
                             :
                             (
-                                inforVocal.tuonghinh.map((item, index) => {
+                                inforVocal.map((item, index) => {
                                     if ((index + 1) % 4 === 0) {
                                         return (
-                                            <h1 className='no-margin' key={index} onClick={() => handleOpenPopupEdit(index)}>{item}</h1>
+                                            <h1 className='no-margin' key={index} onClick={() => handleOpenPopupEdit(index)}>{item.tuonghinh}</h1>
                                         )
                                     } else {
                                         return (
-                                            <h1 key={index} onClick={() => handleOpenPopupEdit(index)}>{item}</h1>
+                                            <h1 key={index} onClick={() => handleOpenPopupEdit(index)}>{item.tuonghinh}</h1>
                                         )
                                     }
 
@@ -263,26 +231,22 @@ const EditVocal = () => {
                             <div className="close">
                                 <IonIcon name="close-outline" id="icon-close" onClick={handleClosePopup} />
                             </div>
-                            <h1 className="vocal">{updateItemVocal.tuonghinh}</h1>
+                            <h1 className="vocal">{inforVocal[indexVocalEdit].tuonghinh}</h1>
                             <div className="infor-edit">
                                 <div className="rowEdit">
                                     <div className="field">
                                         <label>Pinyin</label>
-                                        <input type="text" name="pinyin" value={updateItemVocal.pinyin} onChange={handleChange} />
+                                        <input type="text" name="pinyin" placeholder={inforVocal[indexVocalEdit].pinyin} value={updateItemVocal.pinyin} onChange={handleChange} />
                                     </div>
                                     <div className="field">
                                         <label>Nghĩa</label>
-                                        <input type="text" name="meaning" value={updateItemVocal.meaning} onChange={handleChange} />
+                                        <input type="text" name="meaning" placeholder={inforVocal[indexVocalEdit].meaning} value={updateItemVocal.meaning} onChange={handleChange} />
                                     </div>
                                 </div>
                                 <div className="rowEdit">
                                     <div className="field">
                                         <label>Ví Dụ</label>
-                                        <textarea value={updateItemVocal.example} name="example" onChange={handleChange} />
-                                    </div>
-                                    <div className="field">
-                                        <label>Cấu Tạo Từ</label>
-                                        <textarea value={updateItemVocal.structureChinese} name="structureChinese" onChange={handleChange} />
+                                        <textarea value={updateItemVocal.example} name="example" placeholder={inforVocal[indexVocalEdit].example} onChange={handleChange} />
                                     </div>
                                 </div>
                                 <div className="field">

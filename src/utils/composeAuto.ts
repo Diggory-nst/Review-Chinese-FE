@@ -1,23 +1,10 @@
-
-// Form Data Input
-// {
-//     tuonghinh: ['shi', 'lai'],
-//     meaning: ['có thể', 'chị']
-// }
-
-// Form Data Output
-// [
-//     {
-//         tuonghinh: "shi",
-//         meaning: ['có thể', 'tôi', 'bạn', 'em gái']
-//     }
-// ]
-
-
 // Verison 1: Not Optimized But Use It
 
 interface dataInput {
     tuonghinh: Array<string>,
+    pinyin: Array<string>,
+    type: Array<string>,
+    audio: Array<string>,
     meaning: Array<string>
 }
 
@@ -74,6 +61,9 @@ const composeAutoFunc = (data: dataInput) => {
     const newData = []
 
     const tuonghinh = data.tuonghinh
+    const pinyin = data.pinyin
+    const type = data.type
+    const audio = data.audio
     const meaning = data.meaning
 
     for (let index = 0; index < meaning.length; index++) {
@@ -87,6 +77,9 @@ const composeAutoFunc = (data: dataInput) => {
 
         const object = {
             tuonghinh: tuonghinh[index],
+            pinyin: pinyin[index],
+            type: type[index],
+            audio: audio[index],
             meaning: newMeaning,
             result: meaning[index]
         }

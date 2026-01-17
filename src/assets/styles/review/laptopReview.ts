@@ -60,6 +60,30 @@ const Div = styled.div`
             margin-top: 72px;
         }
 
+        .inforMainWorld {
+            margin-top: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            h1 {
+                font-size: 2.4rem;
+                line-height: 2.4rem;
+                margin-right: 20px;
+            }
+
+            #type {
+                color: #b21d1db8;
+                cursor: default;
+            }
+
+            #iconAudio {
+                font-size: 2.4rem;
+                color: #436ab3;
+                cursor: pointer;
+            }
+        }
+
         .tuong-hinh {
             font-size: 3.6rem;
             line-height: 3.9rem;
@@ -139,7 +163,7 @@ const Div = styled.div`
         border-radius: 8px;
     }
 
-    // Responsive for tablet
+    /* // Responsive for tablet
     @media (min-width:800px) and (max-width:1023px) {
         .main-content {
             width: 82%;
@@ -164,7 +188,7 @@ const Div = styled.div`
         .beauty-image {
             display: none;
         }
-    }
+    } */
 `
 
 export {

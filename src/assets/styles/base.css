@@ -6,11 +6,14 @@
     --colorbutton: #128c7e;
     --border: #adadad #3f5a93 #bf2c24 #9fadc9 #758774 #527f4f #89898957 #436ab3;
 
+    --new: #f3f4f6;
+
 }
 
 * {
     box-sizing: inherit;
-    font-family: 'Lora', serif;
+    /* font-family: 'Lora', serif; */
+    font-family: "Montserrat", sans-serif;
 }
 
 html {

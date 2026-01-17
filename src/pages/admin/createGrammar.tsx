@@ -1,13 +1,8 @@
-
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import {
-    ClassicEditor, Bold, Essentials, Italic, Mention, Paragraph,
-    Undo, Alignment, FontColor, FontSize, Table, TableToolbar
-} from 'ckeditor5';
-import 'ckeditor5/ckeditor5.css';
+import ReactQuill, { Quill } from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 import { Div } from "../../assets/styles/admin/createGrammar";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import configDomain from "../../configs/config.domain";
 import setHeadersRequest from "../../utils/setHeadersRequest";
 import axios from "axios";
@@ -38,7 +33,7 @@ const CreateGrammar = () => {
     }
 
     const submitData = async () => {
-        const dataEditor = editorRef.current.getData()
+        const dataEditor = editorRef.current.getEditor().root.innerHTML;
 
         if (choiceBook.book == '' || choiceBook.lesson == '') {
             setIsError(true)
@@ -47,6 +42,8 @@ const CreateGrammar = () => {
         } else {
             setIsError(false)
         }
+
+        console.log(dataEditor)
 
         const url = `${domain}/admin/createGrammar`
         const data = {
@@ -57,7 +54,7 @@ const CreateGrammar = () => {
 
         try {
             await axios.post(url, data, { headers })
-            editorRef.current.setData('')
+            editorRef.current.getEditor().setText('');
             setChoiceBook({
                 book: '',
                 lesson: ''
@@ -65,6 +62,47 @@ const CreateGrammar = () => {
         } catch (error: any) {
             setIsError(true)
             setMessageError(error.response.data.message)
+        }
+    }
+
+    // Setup React Quill
+
+    useEffect(() => {
+        const quill = editorRef.current?.getEditor();
+        if (quill) {
+            // Tất cả text mới sẽ là 'normal'
+            quill.format('font-size', 'normal');
+
+            // Nếu muốn, gắn luôn class cho root
+            quill.root.classList.add('ql-font-size-normal');
+        }
+    }, []);
+
+    // Import Parchment từ Quill
+    const Parchment = Quill.import('parchment');
+    const ClassAttributor = Parchment.Attributor.Class;
+
+    // Tạo một class Attributor mới cho font size
+    // 'font-size' là tên class, ví dụ: ql-font-size-large
+    // Sau đó sử dụng nó để tạo instance mới
+    let SizeClass = new ClassAttributor('font-size', 'ql-font-size', {
+        scope: Parchment.Scope.INLINE,
+        whitelist: ['normal', 'large', 'huge'],
+        defaultValue: 'normal'
+    });
+
+    Quill.register(SizeClass, true);
+
+    const modules = {
+        toolbar: [
+            [{ header: [1, 2, 3, false] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ 'font-size': ['normal', 'large', 'huge'] }],
+            [{ align: [] }, { color: [] }, { background: [] }],
+            [{ indent: '-1' }, { indent: '+1' }],
+        ],
+        clipboard: {
+            matchVisual: false
         }
     }
 
@@ -81,27 +119,10 @@ const CreateGrammar = () => {
                 </div>
             </div>
             <div className="write-grammar">
-                <CKEditor
-                    editor={ClassicEditor}
-                    config={
-                        {
-                            toolbar: {
-                                items: ['undo', 'redo', '|', 'bold', 'italic', '|', 'alignment', 'fontColor', 'fontSize', 'insertTable']
-                            },
-                            plugins: [
-                                Bold, Essentials, Italic, Mention, Paragraph, Undo, Alignment, FontColor, Table, TableToolbar, FontSize
-                            ],
-                            table: {
-                                contentToolbar: ['tableColumn', 'tableRow']
-                            },
-                            fontSize: {
-                                options: [18, 20, 22]
-                            }
-                        }
-                    }
-                    onReady={(editor) => {
-                        editorRef.current = editor
-                    }}
+                <ReactQuill
+                    theme="snow"
+                    ref={editorRef}
+                    modules={modules}
                 />
             </div>
             {isError &&
