@@ -26,6 +26,8 @@ import { useCallback, useEffect, useState } from 'react'
 import configDomain from '../../configs/config.domain';
 import axios from 'axios'
 import IonIcon from '@reacticons/ionicons'
+import logger from '../../utils/logger';
+import getAxiosErrorMessage from '../../utils/getAxiosErrorMessage';
 
 const images: string[] = [img3, img4, img5, img6, img7, img8, img9, img10, img11, img12, img13, img14, img15, img16, img17, img18, img19, img20, img21, img22]
 
@@ -103,7 +105,7 @@ const LaptopReview = () => {
 
                 setDataBook(data)
             } catch (error) {
-                console.log(error)
+                logger.error(error, 'getDataBook')
             }
         }
 
@@ -127,7 +129,6 @@ const LaptopReview = () => {
         try {
             const res = await axios.post(url, { idBook, idLesson })
             const data = res.data.metadata
-            console.log(data)
             const newData = data.map((item: TypeReview) => {
                 return {
                     tuonghinh: item.tuonghinh,
@@ -146,7 +147,7 @@ const LaptopReview = () => {
             setEndReview(true)
             setBookActive(idLesson)
             setIsError(true)
-            setMessageError(error.response.data.message)
+            setMessageError(getAxiosErrorMessage(error))
         }
     }
 
@@ -236,3 +237,4 @@ const LaptopReview = () => {
 }
 
 export default LaptopReview
+

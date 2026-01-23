@@ -7,10 +7,6 @@ import MobileGrammar from './grammar/mobileGrammar';
 import LaptopGrammar from './grammar/laptopGrammar';
 import MobileReview from './review/mobileReview';
 import LaptopReview from './review/laptopReview';
-// import PrepareLesson from './prepareLesson';
-// import PrivateReview from './privateReview';
-// import Conversation from './conversation';
-// import Translate from './translate';
 import MobileCategory from '../components/mobileCategory';
 import { useState } from 'react';
 
@@ -30,14 +26,6 @@ const Home = () => {
                 return (width || 0) <= 768 ? <MobileGrammar /> : <LaptopGrammar />;
             case 'review':
                 return (width || 0) <= 768 ? <MobileReview /> : <LaptopReview />;
-            case 'prepareLesson':
-            // return <PrepareLesson />
-            case 'privateReview':
-            // return <PrivateReview />
-            case 'conversation':
-            // return <Conversation />
-            case 'translate':
-            // return <Translate />
             default:
                 return <LaptopVocabulary />
         }

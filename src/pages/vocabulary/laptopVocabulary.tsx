@@ -5,6 +5,8 @@ import { useCallback, useEffect, useState } from 'react'
 
 import configDomain from '../../configs/config.domain';
 import axios from 'axios'
+import logger from '../../utils/logger';
+import getAxiosErrorMessage from '../../utils/getAxiosErrorMessage';
 
 interface TypeVocabulary {
     tuonghinh: string,
@@ -67,7 +69,7 @@ const LaptopVocabulary = () => {
 
                 setDataBook(data)
             } catch (error) {
-                console.log(error)
+                logger.error(error, 'getDataBook')
             }
         }
 
@@ -89,7 +91,7 @@ const LaptopVocabulary = () => {
             setBookActive(idLesson)
             setChoiceBook(false)
             setIsError(true)
-            setMessageError(error.response.data.message)
+            setMessageError(getAxiosErrorMessage(error))
         }
     }
 
@@ -146,3 +148,4 @@ const LaptopVocabulary = () => {
 }
 
 export default LaptopVocabulary
+

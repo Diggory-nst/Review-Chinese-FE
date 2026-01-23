@@ -6,6 +6,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 import configDomain from '../../configs/config.domain';
 import axios from 'axios'
+import logger from '../../utils/logger';
+import getAxiosErrorMessage from '../../utils/getAxiosErrorMessage';
 
 interface TypeDataBook {
     book: {
@@ -56,7 +58,7 @@ const LaptopGrammar = () => {
 
                 setDataBook(data)
             } catch (error) {
-                console.log(error)
+                logger.error(error, 'getDataBook')
             }
         }
 
@@ -78,7 +80,7 @@ const LaptopGrammar = () => {
             setBookActive(idLesson)
             setChoiceBook(false)
             setIsError(true)
-            setMessageError(error.response.data.message)
+            setMessageError(getAxiosErrorMessage(error))
             setIsEditorReady(false)
         }
     }
@@ -128,3 +130,4 @@ const LaptopGrammar = () => {
 }
 
 export default LaptopGrammar;
+

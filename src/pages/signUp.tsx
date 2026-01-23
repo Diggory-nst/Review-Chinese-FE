@@ -8,6 +8,7 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 
 import configDomain from "../configs/config.domain";
+import getAxiosErrorMessage from '../utils/getAxiosErrorMessage';
 
 interface User {
     email: string,
@@ -31,6 +32,7 @@ const SignUp = () => {
 
     const [errorValidate, setErrorValidate] = useState<string | null>(null)
     const [isError, setIsError] = useState<boolean>(false)
+    const [isLoading, setIsLoading] = useState<boolean>(false)
 
     const handleChange = (event: any) => {
         setUser(prev => {
@@ -50,9 +52,10 @@ const SignUp = () => {
             return
         }
 
-        if (user.name.length < 3 && user.name.length > 16) {
+        if (user.name.length < 3 || user.name.length > 16) {
             setIsError(true)
             setErrorValidate('The Name Must Be Greater Than 3 Characters And Less Than 16 Characters')
+            return
         }
 
         const valid = validate(user.email, user.password, user.confirmPassword)
@@ -69,6 +72,7 @@ const SignUp = () => {
             return
         }
 
+        setIsLoading(true)
         const url = `${domain}/user/signup`
         const data = {
             email: user.email,
@@ -76,12 +80,15 @@ const SignUp = () => {
             password: user.password
         }
 
-        axios.post(url, data)
-            .then(_res => navigate('waiting-verification'))
-            .catch(error => {
-                setIsError(true)
-                setErrorValidate(error.response.data.message)
-            })
+        try {
+            await axios.post(url, data)
+            navigate('waiting-verification')
+        } catch (error: any) {
+            setIsError(true)
+            setErrorValidate(getAxiosErrorMessage(error, 'An error occurred'))
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     return (
@@ -116,7 +123,9 @@ const SignUp = () => {
                         {isError &&
                             <p className="error">{errorValidate}</p>
                         }
-                        <button type="submit" onClick={handleSubmit}>Đăng Ký</button>
+                        <button type="submit" onClick={handleSubmit} disabled={isLoading}>
+                            {isLoading ? 'Đang xử lý...' : 'Đăng Ký'}
+                        </button>
                         <div className="register">
                             <p>Có tài khoản: <Link to="../login">Đăng Nhập</Link></p>
                         </div>
@@ -128,3 +137,5 @@ const SignUp = () => {
 }
 
 export default SignUp;
+
+

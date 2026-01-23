@@ -5,6 +5,7 @@ import axios from "axios";
 import configDomain from "../../configs/config.domain";
 import setHeadersRequest from "../../utils/setHeadersRequest";
 import { useState } from "react";
+import getAxiosErrorMessage from '../../utils/getAxiosErrorMessage';
 
 interface Choice {
     book: string,
@@ -58,7 +59,7 @@ const ChangeOrderLesson = () => {
             })
         } catch (error: any) {
             setIsError(true)
-            setMessageError(error.response.data.message)
+            setMessageError(getAxiosErrorMessage(error))
         }
     }
 
@@ -103,3 +104,4 @@ const ChangeOrderLesson = () => {
 }
 
 export default ChangeOrderLesson;
+

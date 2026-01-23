@@ -6,8 +6,10 @@ import Pagination from '../../components/pagination';
 
 import configDomain from '../../configs/config.domain';
 import axios from 'axios'
+import logger from '../../utils/logger';
 
 import ListBookMobile from '../../components/listBookMobile';
+import getAxiosErrorMessage from '../../utils/getAxiosErrorMessage';
 
 interface TypeVocabulary {
     tuonghinh: string,
@@ -67,7 +69,7 @@ const MobileVocabulary = () => {
 
                 setDataBook(data)
             } catch (error) {
-                console.log(error)
+                logger.error(error, 'getDataBook')
             }
         }
 
@@ -92,7 +94,7 @@ const MobileVocabulary = () => {
         } catch (error: any) {
             setChoiceBook(false)
             setIsError(true)
-            setMessageError(error.response.data.message)
+            setMessageError(getAxiosErrorMessage(error))
         }
     }
 
@@ -173,3 +175,4 @@ const MobileVocabulary = () => {
 }
 
 export default MobileVocabulary
+

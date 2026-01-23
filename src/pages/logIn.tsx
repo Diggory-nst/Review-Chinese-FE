@@ -7,6 +7,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import configDomain from "../configs/config.domain";
+import logger from "../utils/logger";
+import getAxiosErrorMessage from '../utils/getAxiosErrorMessage';
+
+interface LoginForm {
+    name: string,
+    password: string
+}
 
 interface DataType {
     tokens: {
@@ -25,13 +32,14 @@ const LogIn = () => {
 
     const domain = configDomain?.domain
 
-    const [userPost, setUserPost] = useState<{}>({
+    const [userPost, setUserPost] = useState<LoginForm>({
         name: '',
         password: ''
     })
 
     const [isError, setIsError] = useState<boolean>(false)
     const [messageError, setMessageError] = useState<string>('')
+    const [isLoading, setIsLoading] = useState<boolean>(false)
 
     const handleChange = (event: any) => {
         setUserPost(prev => {
@@ -46,6 +54,20 @@ const LogIn = () => {
 
         event.preventDefault()
 
+        // Validate
+        if (!userPost.name || !userPost.password) {
+            setIsError(true)
+            setMessageError('Please enter complete information')
+            return
+        }
+
+        if (userPost.name.length < 3) {
+            setIsError(true)
+            setMessageError('The name must be at least 3 characters')
+            return
+        }
+
+        setIsLoading(true)
         const url = `${domain}/user/login`
         try {
             const res = await axios.post(url, userPost)
@@ -63,7 +85,10 @@ const LogIn = () => {
 
         } catch (error: any) {
             setIsError(true);
-            setMessageError(error.response.data.message)
+            logger.error('Login error:', error)
+            setMessageError(getAxiosErrorMessage(error, 'An error occurred during login'))
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -92,7 +117,9 @@ const LogIn = () => {
                         {isError &&
                             <p className="error">{messageError}</p>
                         }
-                        <button onClick={handleSubmit}>Đăng Nhập</button>
+                        <button onClick={handleSubmit} disabled={isLoading}>
+                            {isLoading ? 'Đang xử lý...' : 'Đăng Nhập'}
+                        </button>
                         <div className="register">
                             <p>Không có tài khoản: <Link to="../signUp">Đăng Ký</Link></p>
                         </div>
@@ -104,3 +131,4 @@ const LogIn = () => {
 }
 
 export default LogIn;
+

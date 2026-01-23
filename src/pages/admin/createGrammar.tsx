@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import configDomain from "../../configs/config.domain";
 import setHeadersRequest from "../../utils/setHeadersRequest";
 import axios from "axios";
+import getAxiosErrorMessage from '../../utils/getAxiosErrorMessage';
 
 interface ChoiceBook {
     book: string,
@@ -43,8 +44,6 @@ const CreateGrammar = () => {
             setIsError(false)
         }
 
-        console.log(dataEditor)
-
         const url = `${domain}/admin/createGrammar`
         const data = {
             book: choiceBook.book,
@@ -61,7 +60,7 @@ const CreateGrammar = () => {
             })
         } catch (error: any) {
             setIsError(true)
-            setMessageError(error.response.data.message)
+            setMessageError(getAxiosErrorMessage(error))
         }
     }
 
@@ -85,7 +84,7 @@ const CreateGrammar = () => {
     // Tạo một class Attributor mới cho font size
     // 'font-size' là tên class, ví dụ: ql-font-size-large
     // Sau đó sử dụng nó để tạo instance mới
-    let SizeClass = new ClassAttributor('font-size', 'ql-font-size', {
+    const SizeClass = new ClassAttributor('font-size', 'ql-font-size', {
         scope: Parchment.Scope.INLINE,
         whitelist: ['normal', 'large', 'huge'],
         defaultValue: 'normal'
@@ -136,3 +135,4 @@ const CreateGrammar = () => {
 }
 
 export default CreateGrammar;
+

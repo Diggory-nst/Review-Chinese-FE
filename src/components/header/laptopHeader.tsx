@@ -7,6 +7,8 @@ import configDomain from '../../configs/config.domain';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import logger from '../../utils/logger';
+import getAxiosErrorMessage from '../../utils/getAxiosErrorMessage';
 
 type Props = {
     handleSectionShow: (section: string) => void;
@@ -23,8 +25,6 @@ const LaptopHeader: React.FC<Props> = ({ handleSectionShow }) => {
     const [showPopup, setShowPopup] = useState<boolean>(false)
     const [showPopupChangeAvatar, setShowPopupChangeAvatar] = useState<boolean>(false)
     const [showPopupChangePassword, setShowPopupChangePassword] = useState<boolean>(false)
-    const [showExpandFunc, setShowExpandFunc] = useState<boolean>(false)
-
     const [isErrorChange, setIsErrorChange] = useState<boolean>(false)
     const [messageErrorChange, setMessageErrorChange] = useState<string>('')
 
@@ -75,10 +75,6 @@ const LaptopHeader: React.FC<Props> = ({ handleSectionShow }) => {
         showOptionChange ? setShowOptionChange(false) : setShowOptionChange(true)
     }
 
-    const handleShowExpandFunc = () => {
-        showExpandFunc ? setShowExpandFunc(false) : setShowExpandFunc(true)
-    }
-
     const handleChangePassword = () => {
         setShowPopup(true)
         setShowPopupChangePassword(true)
@@ -103,9 +99,9 @@ const LaptopHeader: React.FC<Props> = ({ handleSectionShow }) => {
             await axios.get(url, { headers })
 
             localStorage.clear()
-            window.location.href = '../logIn'
+            window.location.href = '../login'
         } catch (error) {
-            console.log(error);
+            logger.error(error);
         }
     }
 
@@ -133,7 +129,7 @@ const LaptopHeader: React.FC<Props> = ({ handleSectionShow }) => {
             setShowPopup(false)
         } catch (error: any) {
             setIsErrorChange(true)
-            setMessageErrorChange(error.response?.data.message)
+            setMessageErrorChange(getAxiosErrorMessage(error))
         }
     }
 
@@ -141,12 +137,11 @@ const LaptopHeader: React.FC<Props> = ({ handleSectionShow }) => {
     const changeAvatar = async () => {
 
         const url = `${domain}/user/upload-avatar`
-        const data = {
-            image: avatar
-        }
+        const formData = new FormData()
+        formData.append('image', avatar)
 
         try {
-            await axios.patch(url, data, {
+            await axios.patch(url, formData, {
                 headers: {
                     ...headers,
                     "Content-Type": 'multipart/form-data'
@@ -160,7 +155,7 @@ const LaptopHeader: React.FC<Props> = ({ handleSectionShow }) => {
             }, 1000)
         } catch (error: any) {
             setIsErrorChange(true)
-            setMessageErrorChange(error.response?.data.message)
+            setMessageErrorChange(getAxiosErrorMessage(error))
         }
     }
 
@@ -220,19 +215,6 @@ const LaptopHeader: React.FC<Props> = ({ handleSectionShow }) => {
                             }}>{section.charAt(0).toUpperCase() + section.slice(1) === 'Vocabulary' ? 'Từ Vựng' : section.charAt(0).toUpperCase() + section.slice(1) === 'Grammar' ? 'Ngữ Pháp' : 'Ôn Tập'}
                             </h1>
                         ))}
-                        {/* <div className="expand" onClick={handleShowExpandFunc}>
-                            <IonIcon className='icon-expand' name="caret-down-outline"></IonIcon>
-                            <div className="expand-function" style={{ display: showExpandFunc ? 'block' : 'none' }}>
-                                <h1 className="conversation" onClick={() => {
-                                    handleSectionShow('conversation');
-                                    setShowExpandFunc(false);
-                                }}>Đoạn Hội Thoại</h1>
-                                <h1 className="translate" onClick={() => {
-                                    handleSectionShow('translate');
-                                    setShowExpandFunc(false);
-                                }}>Luyện Dịch (V-T)</h1>
-                            </div>
-                        </div> */}
                     </nav>
                     {accessAccount ? (
                         <div className="account" onClick={handleShowOptionChange}>
@@ -310,3 +292,5 @@ const LaptopHeader: React.FC<Props> = ({ handleSectionShow }) => {
 }
 
 export default LaptopHeader
+
+

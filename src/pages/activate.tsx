@@ -4,6 +4,7 @@ import { Div } from '../assets/styles/activate.ts';
 import configDomain from "../configs/config.domain.ts";
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
+import getAxiosErrorMessage from '../utils/getAxiosErrorMessage';
 
 const Activate = () => {
 
@@ -28,7 +29,7 @@ const Activate = () => {
             }, 1500)
         } catch (error: any) {
             setIsError(true)
-            setMessageError(error.response.data.message)
+            setMessageError(getAxiosErrorMessage(error))
         }
     }
 
@@ -48,3 +49,4 @@ const Activate = () => {
 }
 
 export default Activate;
+

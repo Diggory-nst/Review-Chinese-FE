@@ -11,9 +11,9 @@ function App() {
     <Router>
       <Suspense fallback={<div>Loading...</div>}>
         <Routes>
-          {publicRoutes.map((route, index) => {
+          {publicRoutes.map((route) => {
             const Page = route.component
-            return <Route key={index} path={route.path} element={<Page />} />
+            return <Route key={route.path} path={route.path} element={<Page />} />
           })}
           <Route path="*" element={< Page404 />} />
         </Routes>

@@ -7,6 +7,7 @@ import configDomain from '../../configs/config.domain';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import setHeadersRequest from '../../utils/setHeadersRequest';
+import logger from '../../utils/logger';
 
 interface TypeUser {
     _id: string,
@@ -19,8 +20,8 @@ const ManageUser = () => {
     const domain = configDomain?.domain
     const headers = setHeadersRequest()
 
-    const [username, setUsername] = useState<String>('')
-    const [pathImage, setPathImage] = useState<String>('')
+    const [username, setUsername] = useState<string>('')
+    const [pathImage, setPathImage] = useState<string>('')
 
     const [logged, setLogged] = useState<boolean>(false)
     const [status, setStatus] = useState<string>('active')
@@ -77,7 +78,7 @@ const ManageUser = () => {
             setUsers(users)
             setStatus(status)
         } catch (error: any) {
-            console.log(error)
+            logger.error(error, 'getUser')
         }
     }
 
@@ -101,7 +102,7 @@ const ManageUser = () => {
             setTotalUser(totalUser - 1)
             setUsers(newUsers)
         } catch (error) {
-            console.log(error)
+            logger.error(error, 'deleteUser')
         }
     }
 
@@ -112,7 +113,7 @@ const ManageUser = () => {
         try {
             await axios.delete(url, { headers })
         } catch (error) {
-            console.log(error)
+            logger.error(error, 'deleteAllInactiveUser')
         }
     }
 

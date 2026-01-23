@@ -6,6 +6,8 @@ import ListBookMobile from '../../components/listBookMobile';
 
 import configDomain from '../../configs/config.domain';
 import axios from 'axios'
+import logger from '../../utils/logger';
+import getAxiosErrorMessage from '../../utils/getAxiosErrorMessage';
 
 interface TypeDataBook {
     book: {
@@ -42,7 +44,7 @@ const MobileGrammar = () => {
 
                 setDataBook(data)
             } catch (error) {
-                console.log(error)
+                logger.error(error, 'getDataBook')
             }
         }
 
@@ -62,7 +64,7 @@ const MobileGrammar = () => {
         } catch (error: any) {
             setChoiceBook(false)
             setIsError(true)
-            setMessageError(error.response.data.message)
+            setMessageError(getAxiosErrorMessage(error))
             setIsEditorReady(false)
         }
     }
@@ -92,3 +94,4 @@ const MobileGrammar = () => {
 }
 
 export default MobileGrammar
+

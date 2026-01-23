@@ -6,6 +6,7 @@ import axios from "axios";
 import configDomain from "../../configs/config.domain";
 import setHeadersRequest from "../../utils/setHeadersRequest";
 import { useRef, useState } from "react";
+import getAxiosErrorMessage from '../../utils/getAxiosErrorMessage';
 
 interface ChoiceBook {
     book: string,
@@ -55,6 +56,7 @@ const EditVocal = () => {
     })
 
     const tagAudioRef = useRef<HTMLInputElement | null>(null)
+    const currentVocal = inforVocal[indexVocalEdit]
 
     const handleChoiceBook = (e: any) => {
         setChoiceBook(prev => {
@@ -76,7 +78,7 @@ const EditVocal = () => {
             setInforVocal(data)
         } catch (error: any) {
             setIsError(true)
-            setMessageError(error.response.data.message)
+            setMessageError(getAxiosErrorMessage(error))
         }
     }
 
@@ -120,19 +122,21 @@ const EditVocal = () => {
 
     const submitUpdate = async () => {
 
+        if (!currentVocal) return
+
         const url = `${domain}/admin/updateVocabulary`
         const formData = new FormData()
 
-        formData.append('_id', inforVocal[indexVocalEdit]._id);
+        formData.append('_id', currentVocal._id);
         formData.append('audio', updateItemVocal.audio);
 
-        if (compareVocal(updateItemVocal.pinyin, inforVocal[indexVocalEdit].pinyin)) {
+        if (compareVocal(updateItemVocal.pinyin, currentVocal.pinyin)) {
             formData.append('pinyin', updateItemVocal.pinyin);
         }
-        if (compareVocal(updateItemVocal.meaning, inforVocal[indexVocalEdit].meaning)) {
+        if (compareVocal(updateItemVocal.meaning, currentVocal.meaning)) {
             formData.append('meaning', updateItemVocal.meaning);
         }
-        if (compareVocal(updateItemVocal.example, inforVocal[indexVocalEdit].example)) {
+        if (compareVocal(updateItemVocal.example, currentVocal.example)) {
             formData.append('example', updateItemVocal.example);
         }
 
@@ -149,21 +153,23 @@ const EditVocal = () => {
             tagAudioRef.current.value = ''
         } catch (error: any) {
             setIsError(true)
-            setMessageError(error.response.data.message)
+            setMessageError(getAxiosErrorMessage(error))
         }
     }
 
     const deleteElementVocabulary = async () => {
 
+        if (!currentVocal) return
+
         const url = `${domain}/admin/deleteElementVocabulary`
 
         try {
-            await axios.post(url, { _id: inforVocal[indexVocalEdit]._id }, { headers })
+            await axios.post(url, { _id: currentVocal._id }, { headers })
             setOpenPopup(false)
             getAllinformationVocal()
         } catch (error: any) {
             setIsError(true)
-            setMessageError(error.response.data.message)
+            setMessageError(getAxiosErrorMessage(error))
         }
     }
 
@@ -231,22 +237,22 @@ const EditVocal = () => {
                             <div className="close">
                                 <IonIcon name="close-outline" id="icon-close" onClick={handleClosePopup} />
                             </div>
-                            <h1 className="vocal">{inforVocal[indexVocalEdit].tuonghinh}</h1>
+                            <h1 className="vocal">{currentVocal?.tuonghinh}</h1>
                             <div className="infor-edit">
                                 <div className="rowEdit">
                                     <div className="field">
                                         <label>Pinyin</label>
-                                        <input type="text" name="pinyin" placeholder={inforVocal[indexVocalEdit].pinyin} value={updateItemVocal.pinyin} onChange={handleChange} />
+                                        <input type="text" name="pinyin" placeholder={currentVocal?.pinyin || ''} value={updateItemVocal.pinyin} onChange={handleChange} />
                                     </div>
                                     <div className="field">
                                         <label>Nghĩa</label>
-                                        <input type="text" name="meaning" placeholder={inforVocal[indexVocalEdit].meaning} value={updateItemVocal.meaning} onChange={handleChange} />
+                                        <input type="text" name="meaning" placeholder={currentVocal?.meaning || ''} value={updateItemVocal.meaning} onChange={handleChange} />
                                     </div>
                                 </div>
                                 <div className="rowEdit">
                                     <div className="field">
                                         <label>Ví Dụ</label>
-                                        <textarea value={updateItemVocal.example} name="example" placeholder={inforVocal[indexVocalEdit].example} onChange={handleChange} />
+                                        <textarea value={updateItemVocal.example} name="example" placeholder={currentVocal?.example || ''} onChange={handleChange} />
                                     </div>
                                 </div>
                                 <div className="field">
@@ -272,3 +278,5 @@ const EditVocal = () => {
 }
 
 export default EditVocal;
+
+

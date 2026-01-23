@@ -6,6 +6,7 @@ import axios from "axios";
 import configDomain from "../../configs/config.domain";
 import setHeadersRequest from "../../utils/setHeadersRequest";
 import { useState, useRef, useEffect } from "react";
+import getAxiosErrorMessage from '../../utils/getAxiosErrorMessage';
 
 interface FormAddItem {
     tuonghinh: string,
@@ -45,7 +46,12 @@ const CreateVocal = () => {
         lesson: ''
     })
 
+    // Mode selection state: Manual vs Excel
+    const [inputMode, setInputMode] = useState<'manual' | 'excel'>('manual');
+    const [excelFile, setExcelFile] = useState<File | null>(null);
+
     const tagAudioRef = useRef<HTMLInputElement | null>(null)
+    const tagExcelRef = useRef<HTMLInputElement | null>(null)
 
     const handleRemoveItemVocal = (index: number) => {
         setArrayItemVocal(prev => prev.filter((_, i) => i !== index))
@@ -77,6 +83,12 @@ const CreateVocal = () => {
         setArrayItemVocal(newArrItemVocal)
     }
 
+    const handleExcelFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setExcelFile(e.target.files[0]);
+        }
+    }
+
     const handleChoiceBook = (e: any) => {
         setChoiceBook(prev => {
             return { ...prev, [e.target.name]: e.target.value }
@@ -93,6 +105,41 @@ const CreateVocal = () => {
             setIsError(false)
         }
 
+        if (inputMode === 'excel') {
+            if (!excelFile) {
+                setIsError(true);
+                setMessageError('Please select an Excel file');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('book', choiceBook.book);
+            formData.append('lesson', choiceBook.lesson);
+            formData.append('file', excelFile);
+
+            try {
+                const url = `${domain}/admin/createVocabularyByExcel`;
+                const response = await axios.post(url, formData, {
+                    headers: {
+                        ...headers,
+                        "Content-Type": 'multipart/form-data'
+                    }
+                });
+
+                alert(`Import successful! Imported ${response.data.metadata.importedCount} words.`);
+
+                setChoiceBook({ book: '', lesson: '' });
+                setExcelFile(null);
+                if (tagExcelRef.current) tagExcelRef.current.value = '';
+
+            } catch (error: any) {
+                setIsError(true);
+                setMessageError(getAxiosErrorMessage(error, 'Import failed'));
+            }
+            return;
+        }
+
+        // Manual Input Logic
         const url = `${domain}/admin/createVocabulary`
         const arrAudio: any[] = []
         arrItemVocal.map(item => {
@@ -150,7 +197,7 @@ const CreateVocal = () => {
 
         } catch (error: any) {
             setIsError(true);
-            setMessageError(error.response.data.message)
+            setMessageError(getAxiosErrorMessage(error))
         }
     }
 
@@ -203,6 +250,7 @@ const CreateVocal = () => {
     };
 
     return (
+
         <Div className="create-vocal">
             <div className="choice-book">
                 <div className="book">
@@ -214,86 +262,133 @@ const CreateVocal = () => {
                     <input type="text" name="lesson" value={choiceBook.lesson} onChange={handleChoiceBook} />
                 </div>
             </div>
-            <div className="compose-lesson">
-                <div className="list-vocal" ref={itemRef}>
-                    {arrItemVocal.map((item, index) => {
-                        const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-                            handleChange(e, index);
 
-                        const handleNavigateClick = (field: FormAddItemKey) => () =>
-                            handleClickNavigate(index, field);
-
-                        const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-                            handleFileChange(index, 'audio', e.target.files);
-                        return (
-                            <div className="item-vocal navigate" key={index}>
-                                <div className="tag-input">
-                                    <input
-                                        type="text"
-                                        placeholder="Tượng Hình"
-                                        value={item.tuonghinh}
-                                        name="tuonghinh"
-                                        onChange={handleInputChange}
-                                        onClick={handleNavigateClick('tuonghinh')}
-                                        autoComplete="off"
-                                    />
-                                    <input
-                                        type="text"
-                                        placeholder="Pinyin"
-                                        value={item.pinyin}
-                                        name="pinyin"
-                                        onChange={handleInputChange}
-                                        onClick={handleNavigateClick('pinyin')}
-                                        autoComplete="off"
-                                    />
-                                    <input
-                                        type="text"
-                                        placeholder="Loại Từ"
-                                        value={item.type}
-                                        name="type"
-                                        className="typeInput"
-                                        onChange={handleInputChange}
-                                        onClick={handleNavigateClick('type')}
-                                        autoComplete="off"
-                                    />
-                                    <input
-                                        type="text"
-                                        placeholder="Nghĩa"
-                                        value={item.meaning}
-                                        name="meaning"
-                                        className="meaningInput"
-                                        onChange={handleInputChange}
-                                        onClick={handleNavigateClick('meaning')}
-                                        autoComplete="off"
-                                    />
-                                    <input
-                                        type="file"
-                                        id="file-am-thanh"
-                                        name="audio"
-                                        placeholder="Âm Thanh"
-                                        ref={tagAudioRef}
-                                        onChange={handleFileInputChange}
-                                        onClick={handleNavigateClick('audio')}
-                                    />
-                                    <IonIcon name="close-outline" id="icon-remove-item-vocal" onClick={() => handleRemoveItemVocal(index)}></IonIcon>
-                                </div>
-                                <div className="tag-area">
-                                    <textarea
-                                        placeholder="Ví Dụ"
-                                        value={item.example}
-                                        name="example"
-                                        onChange={handleInputChange}
-                                        onClick={handleNavigateClick('example')}
-                                    />
-                                </div>
-                            </div>
-                        )
-                    })}
-                </div>
-                <div className="add-new">
-                    <IonIcon name="add-outline" id="icon-add" onClick={handleAddItemVocal}></IonIcon>
-                </div>
+            <div className="mode-switch" style={{ margin: '20px 0', display: 'flex', gap: '10px' }}>
+                <button
+                    onClick={() => setInputMode('manual')}
+                    style={{
+                        padding: '10px 20px',
+                        backgroundColor: inputMode === 'manual' ? '#007bff' : '#f0f0f0',
+                        color: inputMode === 'manual' ? 'white' : 'black',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer'
+                    }}
+                >
+                    Nhập Thủ Công
+                </button>
+                <button
+                    onClick={() => setInputMode('excel')}
+                    style={{
+                        padding: '10px 20px',
+                        backgroundColor: inputMode === 'excel' ? '#007bff' : '#f0f0f0',
+                        color: inputMode === 'excel' ? 'white' : 'black',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer'
+                    }}
+                >
+                    Nhập Excel
+                </button>
             </div>
+
+            {inputMode === 'manual' ? (
+                <div className="compose-lesson">
+                    <div className="list-vocal" ref={itemRef}>
+                        {arrItemVocal.map((item, index) => {
+                            const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+                                handleChange(e, index);
+
+                            const handleNavigateClick = (field: FormAddItemKey) => () =>
+                                handleClickNavigate(index, field);
+
+                            const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+                                handleFileChange(index, 'audio', e.target.files);
+                            return (
+                                <div className="item-vocal navigate" key={index}>
+                                    <div className="tag-input">
+                                        <input
+                                            type="text"
+                                            placeholder="Tượng Hình"
+                                            value={item.tuonghinh}
+                                            name="tuonghinh"
+                                            onChange={handleInputChange}
+                                            onClick={handleNavigateClick('tuonghinh')}
+                                            autoComplete="off"
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Pinyin"
+                                            value={item.pinyin}
+                                            name="pinyin"
+                                            onChange={handleInputChange}
+                                            onClick={handleNavigateClick('pinyin')}
+                                            autoComplete="off"
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Loại Từ"
+                                            value={item.type}
+                                            name="type"
+                                            className="typeInput"
+                                            onChange={handleInputChange}
+                                            onClick={handleNavigateClick('type')}
+                                            autoComplete="off"
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Nghĩa"
+                                            value={item.meaning}
+                                            name="meaning"
+                                            className="meaningInput"
+                                            onChange={handleInputChange}
+                                            onClick={handleNavigateClick('meaning')}
+                                            autoComplete="off"
+                                        />
+                                        <input
+                                            type="file"
+                                            id="file-am-thanh"
+                                            name="audio"
+                                            placeholder="Âm Thanh"
+                                            ref={tagAudioRef}
+                                            onChange={handleFileInputChange}
+                                            onClick={handleNavigateClick('audio')}
+                                        />
+                                        <IonIcon name="close-outline" id="icon-remove-item-vocal" onClick={() => handleRemoveItemVocal(index)}></IonIcon>
+                                    </div>
+                                    <div className="tag-area">
+                                        <textarea
+                                            placeholder="Ví Dụ"
+                                            value={item.example}
+                                            name="example"
+                                            onChange={handleInputChange}
+                                            onClick={handleNavigateClick('example')}
+                                        />
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </div>
+                    <div className="add-new">
+                        <IonIcon name="add-outline" id="icon-add" onClick={handleAddItemVocal}></IonIcon>
+                    </div>
+                </div>
+            ) : (
+                <div className="excel-import" style={{ padding: '20px', border: '2px dashed #ccc', borderRadius: '10px', textAlign: 'center' }}>
+                    <h3>Chọn file Excel để nhập từ vựng</h3>
+                    <input
+                        type="file"
+                        accept=".xlsx, .xls"
+                        style={{ marginTop: '10px' }}
+                        onChange={handleExcelFileChange}
+                        ref={tagExcelRef}
+                    />
+                    <p style={{ marginTop: '10px', color: '#666', fontSize: '0.9em' }}>
+                        * Định dạng file: [Tượng Hình] [Pinyin] [Loại từ] [Nghĩa] [Ví dụ]
+                    </p>
+                </div>
+            )}
+
             {isError &&
                 <p className="error">{messageError}</p>
             }
@@ -305,3 +400,6 @@ const CreateVocal = () => {
 }
 
 export default CreateVocal;
+
+
+

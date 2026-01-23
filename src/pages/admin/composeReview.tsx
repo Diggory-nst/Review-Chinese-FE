@@ -6,6 +6,7 @@ import composeAutoFunc from "../../utils/composeAuto";
 import axios from "axios";
 import configDomain from "../../configs/config.domain";
 import setHeadersRequest from "../../utils/setHeadersRequest";
+import getAxiosErrorMessage from '../../utils/getAxiosErrorMessage';
 
 interface ChoiceBook {
     book: string,
@@ -42,11 +43,11 @@ const ComposeReview = () => {
             const res = await axios.post(urlGet, choiceBook, { headers })
             const rawData = res.data.metadata
 
-            let tuonghinh: Array<string> = []
-            let pinyin: Array<string> = []
-            let audio: Array<string> = []
-            let type: Array<string> = []
-            let meaning: Array<string> = []
+            const tuonghinh: Array<string> = []
+            const pinyin: Array<string> = []
+            const audio: Array<string> = []
+            const type: Array<string> = []
+            const meaning: Array<string> = []
 
             rawData.map((item: any) => {
                 tuonghinh.push(item.tuonghinh)
@@ -70,7 +71,7 @@ const ComposeReview = () => {
             setIsError(false)
         } catch (error: any) {
             setIsError(true)
-            setMessageError(error.response.data.message)
+            setMessageError(getAxiosErrorMessage(error))
         }
     }
 
@@ -136,3 +137,4 @@ const ComposeReview = () => {
 }
 
 export default ComposeReview;
+

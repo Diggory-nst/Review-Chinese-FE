@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import configDomain from "../../configs/config.domain";
 import setHeadersRequest from "../../utils/setHeadersRequest";
+import getAxiosErrorMessage from '../../utils/getAxiosErrorMessage';
 
 interface ChoiceBook {
     book: string,
@@ -108,7 +109,7 @@ const ComposeManual: React.FC<Props> = ({ handleChangeShowComposeManual }) => {
             setMessageError('')
         } catch (error: any) {
             setIsError(true)
-            setMessageError(error.response.data.message)
+            setMessageError(getAxiosErrorMessage(error))
         }
     }
 
@@ -218,3 +219,4 @@ const ComposeManual: React.FC<Props> = ({ handleChangeShowComposeManual }) => {
 }
 
 export default ComposeManual;
+

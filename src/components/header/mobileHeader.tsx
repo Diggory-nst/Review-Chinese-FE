@@ -7,6 +7,7 @@ import configDomain from '../../configs/config.domain';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import getAxiosErrorMessage from '../../utils/getAxiosErrorMessage';
 
 const MobileHeader: React.FC = () => {
 
@@ -127,7 +128,7 @@ const MobileHeader: React.FC = () => {
             setShowPopup(false)
         } catch (error: any) {
             setIsErrorChange(true)
-            setMessageErrorChange(error.response?.data.message)
+            setMessageErrorChange(getAxiosErrorMessage(error))
         }
     }
 
@@ -135,12 +136,11 @@ const MobileHeader: React.FC = () => {
     const changeAvatar = async () => {
 
         const url = `${domain}/user/upload-avatar`
-        const data = {
-            image: avatar
-        }
+        const formData = new FormData()
+        formData.append('image', avatar)
 
         try {
-            await axios.patch(url, data, {
+            await axios.patch(url, formData, {
                 headers: {
                     ...headers,
                     "Content-Type": 'multipart/form-data'
@@ -154,7 +154,7 @@ const MobileHeader: React.FC = () => {
             }, 1000)
         } catch (error: any) {
             setIsErrorChange(true)
-            setMessageErrorChange(error.response?.data.message)
+            setMessageErrorChange(getAxiosErrorMessage(error))
         }
     }
 
@@ -301,3 +301,5 @@ const MobileHeader: React.FC = () => {
 }
 
 export default MobileHeader
+
+

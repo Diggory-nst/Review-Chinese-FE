@@ -7,6 +7,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 import configDomain from "../configs/config.domain";
+import getAxiosErrorMessage from '../utils/getAxiosErrorMessage';
 
 const FogotPassword = () => {
 
@@ -30,7 +31,7 @@ const FogotPassword = () => {
             .then(_res => navigate('../waiting-reset-password'))
             .catch(error => {
                 setIsError(true)
-                setMessageError(error.response.data.message)
+                setMessageError(getAxiosErrorMessage(error))
             })
     }
 
@@ -63,3 +64,4 @@ const FogotPassword = () => {
 }
 
 export default FogotPassword;
+

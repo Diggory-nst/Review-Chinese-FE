@@ -6,6 +6,7 @@ import configDomain from "../../configs/config.domain";
 import setHeadersRequest from "../../utils/setHeadersRequest";
 import axios from "axios";
 import { useRef, useState } from "react";
+import getAxiosErrorMessage from '../../utils/getAxiosErrorMessage';
 
 interface ChoiceBook {
     book: string,
@@ -70,7 +71,7 @@ const EditGrammar = () => {
 
             } catch (error: any) {
                 setIsError(true)
-                setMessageError(error.response?.data.message)
+                setMessageError(getAxiosErrorMessage(error))
             }
         }
 
@@ -94,7 +95,7 @@ const EditGrammar = () => {
             await axios.patch(url, data, { headers })
         } catch (error: any) {
             setIsError(true)
-            setMessageError(error.response.data.message)
+            setMessageError(getAxiosErrorMessage(error))
         }
     }
 
@@ -188,3 +189,4 @@ const EditGrammar = () => {
 }
 
 export default EditGrammar;
+

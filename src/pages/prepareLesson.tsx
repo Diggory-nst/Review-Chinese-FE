@@ -3,10 +3,12 @@ import icon_next from '../assets/img/icon/icon-next.svg'
 import IonIcon from '@reacticons/ionicons'
 
 import { Div } from '../assets/styles/prepareLesson'
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import configDomain from "../configs/config.domain";
 import setHeadersRequest from "../utils/setHeadersRequest";
+import logger from "../utils/logger";
+import getAxiosErrorMessage from '../utils/getAxiosErrorMessage';
 
 interface DataSubmitCompose {
     tuonghinh: string,
@@ -49,7 +51,7 @@ interface InforCompose {
 const PrepareLesson = () => {
 
     const domain = configDomain?.domain
-    const headers = setHeadersRequest()
+    const headers = useMemo(() => setHeadersRequest(), [])
     const [logged, setLogged] = useState<boolean>(false)
     const [isError, setIsError] = useState<boolean>(false)
     const [messageError, setMessageError] = useState<string>('')
@@ -121,10 +123,9 @@ const PrepareLesson = () => {
         try {
             const res = await axios.post(url, { idUser }, { headers })
             const data = res.data.metadata
-
             setListNameCompose(data)
         } catch (error) {
-            console.log(error)
+            logger.error(error, 'getDataBook')
         }
     }
 
@@ -156,7 +157,7 @@ const PrepareLesson = () => {
             meaning: arrMeaning,
             result: meaning1
         }
-        setArrCompose([...arrCompose, object])
+        setArrCompose(prev => [...prev, object])
         setDataSubmitCompose({
             tuonghinh: '',
             meaning1: '',
@@ -164,7 +165,7 @@ const PrepareLesson = () => {
             meaning3: '',
             meaning4: ''
         })
-        setListWordAdded([...listWordAdded, tuonghinh])
+        setListWordAdded(prev => [...prev, tuonghinh])
     }
 
     const submitDataCompose = async () => {
@@ -193,7 +194,7 @@ const PrepareLesson = () => {
             getDataBook()
         } catch (error: any) {
             setIsError(true)
-            setMessageError(error.response.data.message)
+            setMessageError(getAxiosErrorMessage(error))
         }
     }
 
@@ -215,7 +216,7 @@ const PrepareLesson = () => {
             })
             setBookActive(idCompose)
         } catch (error: any) {
-            console.log(error)
+            logger.error(error, 'showCompose')
         }
     }
 
@@ -277,7 +278,7 @@ const PrepareLesson = () => {
             setMessageError('')
         } catch (error: any) {
             setIsError(true)
-            setMessageError(error.response.data.message)
+            setMessageError(getAxiosErrorMessage(error))
         }
     }
 
@@ -303,7 +304,7 @@ const PrepareLesson = () => {
             setBookActive('')
             getDataBook()
         } catch (error) {
-            console.log(error)
+            logger.error(error, 'removeUserCompose')
         }
     }
 
@@ -367,11 +368,19 @@ const PrepareLesson = () => {
         setActive(index);
     };
 
-    document.addEventListener('keydown', (e: KeyboardEvent) => {
-        if (e.key === 'Alt') {
-            nextWord()
+    useEffect(() => {
+        const handleAltKey = (e: KeyboardEvent) => {
+            if (e.key === 'Alt') {
+                nextWord()
+            }
         }
-    })
+
+        document.addEventListener('keydown', handleAltKey);
+
+        return () => {
+            document.removeEventListener('keydown', handleAltKey);
+        };
+    }, [])
 
     return (
         <>
@@ -492,3 +501,4 @@ const PrepareLesson = () => {
 }
 
 export default PrepareLesson;
+

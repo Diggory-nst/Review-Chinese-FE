@@ -6,20 +6,14 @@ import { Div } from '../../assets/styles/admin/admin';
 
 import CreateVocal from './createVocal';
 import EditVocal from './editVocal';
+import DeleteVocal from './deleteVocal';
 import CreateGrammar from './createGrammar';
 import EditGrammar from './editGrammar';
 import DeleteGrammar from './deleteGrammar';
 import ComposeReview from './composeReview';
-import ComposeManyLesson from './composeManyLesson';
+import DeleteReview from './deleteReview';
 import EditPrepare from './editPrepare';
 import ChangeOrderLesson from './changeOrderLesson';
-// import CreateConversation from './createConversation';
-// import EditConversation from './editConversation';
-// import DeleteConversation from './deleteConversation';
-// import CreateTranslate from './createTranslate';
-// import EditTranslate from './editTranslate';
-// import DeleteTranslate from './deleteTranslate';
-
 import configDomain from '../../configs/config.domain';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -32,10 +26,10 @@ const Admin = () => {
     const headers = setHeadersRequest()
 
     const [logged, setLogged] = useState<boolean>(false)
-    const [username, setUsername] = useState<String>('')
-    const [pathImage, setPathImage] = useState<String>('')
-    const [sectionActive, setSectionActive] = useState<String>('choiceSection')
-    const [sectionShow, setSectionShow] = useState<String>('choiceSection')
+    const [username, setUsername] = useState<string>('')
+    const [pathImage, setPathImage] = useState<string>('')
+    const [sectionActive, setSectionActive] = useState<string>('choiceSection')
+    const [sectionShow, setSectionShow] = useState<string>('choiceSection')
 
     const client_id = localStorage.getItem('client_id')
     const accessToken = localStorage.getItem('accessToken')
@@ -67,7 +61,7 @@ const Admin = () => {
         checkLogin()
     }, [])
 
-    const renderSwitch = (param: String) => {
+    const renderSwitch = (param: string) => {
         switch (param) {
             case 'choiceSection':
                 return (
@@ -79,6 +73,8 @@ const Admin = () => {
                 return <CreateVocal />
             case 'cstv':
                 return <EditVocal />
+            case 'xtv':
+                return <DeleteVocal />
             case 'snpm':
                 return <CreateGrammar />
             case 'csnp':
@@ -87,24 +83,12 @@ const Admin = () => {
                 return <DeleteGrammar />
             case 'sot':
                 return <ComposeReview />
-            case 'snb':
-                return <ComposeManyLesson />
+            case 'xot':
+                return <DeleteReview />
             case 'csot':
                 return <EditPrepare />
             case 'sxbh':
                 return <ChangeOrderLesson />
-            case 'tdht':
-            // return <CreateConversation />
-            case 'sdht':
-            // return <EditConversation />
-            case 'xdht':
-            // return <DeleteConversation />
-            case 'tbd':
-            // return <CreateTranslate />
-            case 'csbd':
-            // return <EditTranslate />
-            case 'xbd':
-            // return <DeleteTranslate />
             default:
                 return (
                     <div className="wait-page">
@@ -114,7 +98,7 @@ const Admin = () => {
         }
     }
 
-    const handleSectionShow = (param: String) => {
+    const handleSectionShow = (param: string) => {
         setSectionActive(param)
         setSectionShow(param)
     }
@@ -142,6 +126,7 @@ const Admin = () => {
                                     <h1 className='title'>Từ Vựng</h1>
                                     <h1 style={{ color: sectionActive === 'stvm' ? '#527f4f' : 'black' }} onClick={() => handleSectionShow('stvm')}>Soạn Từ Vựng Mới</h1>
                                     <h1 style={{ color: sectionActive === 'cstv' ? '#527f4f' : 'black' }} onClick={() => handleSectionShow('cstv')}>Chỉnh Sửa Từ Vựng</h1>
+                                    <h1 style={{ color: sectionActive === 'xtv' ? '#527f4f' : 'black' }} onClick={() => handleSectionShow('xtv')}>Xóa Từ Vựng</h1>
                                 </div>
                                 <div className="section-grammar cssChung">
                                     <h1 className='title'>Ngữ Pháp</h1>
@@ -152,25 +137,13 @@ const Admin = () => {
                                 <div className="section-review cssChung">
                                     <h1 className='title'>Ôn Tập</h1>
                                     <h1 style={{ color: sectionActive === 'sot' ? '#527f4f' : 'black' }} onClick={() => handleSectionShow('sot')}>Soạn Ôn Tập</h1>
-                                    <h1 style={{ color: sectionActive === 'snb' ? '#527f4f' : 'black' }} onClick={() => handleSectionShow('snb')}>Soạn Nhiều Bài</h1>
                                     <h1 style={{ color: sectionActive === 'csot' ? '#527f4f' : 'black' }} onClick={() => handleSectionShow('csot')}>Chỉnh Sửa Ôn Tập</h1>
+                                    <h1 style={{ color: sectionActive === 'xot' ? '#527f4f' : 'black' }} onClick={() => handleSectionShow('xot')}>Xóa Ôn Tập</h1>
                                 </div>
                                 <div className="section-changeOrder cssChung">
                                     <h1 className='title'>Sắp Xếp Thứ Tự</h1>
                                     <h1 style={{ color: sectionActive === 'sxbh' ? '#527f4f' : 'black' }} onClick={() => handleSectionShow('sxbh')}>Sắp Xếp Bài Học</h1>
                                 </div>
-                                {/* <div className="section-conversation cssChung">
-                                    <h1 className='title'>Đoạn Hội Thoại</h1>
-                                    <h1 style={{ color: sectionActive === 'tdht' ? '#527f4f' : 'black' }} onClick={() => handleSectionShow('tdht')}>Thêm Đoạn Hội Thoại</h1>
-                                    <h1 style={{ color: sectionActive === 'sdht' ? '#527f4f' : 'black' }} onClick={() => handleSectionShow('sdht')}>Sửa Đoạn Hội Thoại</h1>
-                                    <h1 style={{ color: sectionActive === 'xdht' ? '#527f4f' : 'black' }} onClick={() => handleSectionShow('xdht')}>Xóa Đoạn Hội Thoại</h1>
-                                </div> */}
-                                {/* <div className="section-translate cssChung">
-                                    <h1 className='title'>Bài Luyện Dịch</h1>
-                                    <h1 style={{ color: sectionActive === 'tbd' ? '#527f4f' : 'black' }} onClick={() => handleSectionShow('tbd')}>Thêm Bài Luyện Dịch</h1>
-                                    <h1 style={{ color: sectionActive === 'csbd' ? '#527f4f' : 'black' }} onClick={() => handleSectionShow('csbd')}>Chỉnh Sửa Bài Luyện Dịch</h1>
-                                    <h1 style={{ color: sectionActive === 'xbd' ? '#527f4f' : 'black' }} onClick={() => handleSectionShow('xbd')}>Xóa Bài Luyện Dịch</h1>
-                                </div> */}
                                 <div className="moveToManageUser">
                                     <Link to="../admin-manage-user">Quản Lý Người Dùng</Link>
                                 </div>
@@ -192,3 +165,4 @@ const Admin = () => {
 }
 
 export default Admin;
+

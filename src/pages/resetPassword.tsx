@@ -7,6 +7,7 @@ import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 
 import configDomain from "../configs/config.domain";
+import getAxiosErrorMessage from '../utils/getAxiosErrorMessage';
 
 const ResetPassword = () => {
 
@@ -48,7 +49,7 @@ const ResetPassword = () => {
             .then(_res => navigate('../login'))
             .catch(error => {
                 setIsError(true)
-                setMessageError(error.response.data.message)
+                setMessageError(getAxiosErrorMessage(error))
             })
     }
 
@@ -80,3 +81,4 @@ const ResetPassword = () => {
 }
 
 export default ResetPassword;
+

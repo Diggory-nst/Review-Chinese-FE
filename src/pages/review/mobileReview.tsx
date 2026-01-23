@@ -5,7 +5,9 @@ import { useCallback, useEffect, useState } from 'react'
 
 import configDomain from '../../configs/config.domain';
 import axios from 'axios'
+import logger from '../../utils/logger';
 import IonIcon from '@reacticons/ionicons';
+import getAxiosErrorMessage from '../../utils/getAxiosErrorMessage';
 
 interface TypeDataBook {
     book: {
@@ -56,7 +58,7 @@ const MobileReview = () => {
 
                 setDataBook(data)
             } catch (error) {
-                console.log(error)
+                logger.error(error, 'getDataBook')
             }
         }
 
@@ -88,7 +90,7 @@ const MobileReview = () => {
         } catch (error: any) {
             setEndReview(true)
             setIsError(true)
-            setMessageError(error.response.data.message)
+            setMessageError(getAxiosErrorMessage(error))
         }
     }
 
@@ -157,3 +159,4 @@ const MobileReview = () => {
 }
 
 export default MobileReview
+

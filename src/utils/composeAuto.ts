@@ -1,138 +1,73 @@
-// Verison 1: Not Optimized But Use It
 
-interface dataInput {
-    tuonghinh: Array<string>,
-    pinyin: Array<string>,
-    type: Array<string>,
-    audio: Array<string>,
-    meaning: Array<string>
+interface DataInput {
+    tuonghinh: string[];
+    pinyin: string[];
+    type: string[];
+    audio: string[];
+    meaning: string[];
 }
 
-const randomNumber = (index: number, arrLength: number) => {
-
-    const midNumber = Math.floor(arrLength / 2)
-    const leftMidNumber = Math.floor(midNumber / 2)
-    const rightMidNumber = midNumber + leftMidNumber
-
-    let number1 = 0
-    let number2 = 0
-    let number3 = 0
-
-    if (index < leftMidNumber) {
-        number1 = Math.floor(Math.random() * ((arrLength + 1) - index)) + index;
-        number2 = Math.floor(Math.random() * ((number1 + 1) - index)) + index;
-        number3 = Math.floor(Math.random() * (arrLength - number1)) + number1;
+// Helper to shuffle an array (Fisher-Yates)
+const shuffleArray = <T>(array: T[]): T[] => {
+    const newArr = [...array];
+    for (let i = newArr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
     }
+    return newArr;
+};
 
-    if (index > rightMidNumber) {
-        number1 = Math.floor(Math.random() * (index - 1))
-        number2 = Math.floor(Math.random() * number1)
-        number3 = Math.floor(Math.random() * (arrLength - number1)) + number1;
-    }
+const composeAutoFunc = (data: DataInput) => {
+    const newData = [];
+    const { tuonghinh, pinyin, type, audio, meaning } = data;
 
-    if (index >= leftMidNumber && index <= rightMidNumber) {
-        number1 = Math.floor(Math.random() * (index - 1))
-        number2 = Math.floor(Math.random() * (arrLength - index)) + (index + 1)
+    const totalItems = meaning.length;
 
-        const a = Math.abs(number1 - index)
-        const b = Math.abs(number2 - index)
+    for (let i = 0; i < totalItems; i++) {
+        const currentMeaning = meaning[i];
 
-        if (a > b) {
-            number3 = Math.floor(Math.random() * ((index - 1) - number1 + 1)) + number1;
+        // Skip if current meaning is empty/invalid
+        if (!currentMeaning) continue;
+
+        // Use a Set to ensure unique distractors (by value, not just index)
+        const distractorSet = new Set<string>();
+
+        // Safety: ensure we don't infinite loop if not enough unique words exist
+        let attempts = 0;
+        const maxAttempts = 50;
+
+        // Try to get 3 unique distractors
+        while (distractorSet.size < 3 && attempts < maxAttempts) {
+            const randomIndex = Math.floor(Math.random() * totalItems);
+            const randomMeaning = meaning[randomIndex];
+
+            // 1. Must exist
+            // 2. Must not be the correct answer
+            // 3. Must not be already selected as a distractor
+            if (randomMeaning && randomMeaning !== currentMeaning && !distractorSet.has(randomMeaning)) {
+                distractorSet.add(randomMeaning);
+            }
+            attempts++;
         }
 
-        if (b > a) {
-            number3 = Math.floor(Math.random() * (number2 - (index + 1) + 1)) + (index + 1);
-        }
+        // If listing is too small, we might have fewer than 3 distractors, 
+        // but the code handles it gracefully by only adding what it found.
+        const options = [currentMeaning, ...Array.from(distractorSet)];
 
-        if (a === b) {
-            number3 = Math.floor(Math.random() * (number2 - (index + 1) + 1)) + (index + 1);
-        }
+        // Shuffle options so the correct answer isn't always at the same position
+        const shuffledOptions = shuffleArray(options);
+
+        newData.push({
+            tuonghinh: tuonghinh[i],
+            pinyin: pinyin[i],
+            type: type[i],
+            audio: audio[i],
+            meaning: shuffledOptions,
+            result: currentMeaning
+        });
     }
 
-    return {
-        number1,
-        number2,
-        number3
-    }
-}
+    return newData;
+};
 
-const composeAutoFunc = (data: dataInput) => {
-    const newData = []
-
-    const tuonghinh = data.tuonghinh
-    const pinyin = data.pinyin
-    const type = data.type
-    const audio = data.audio
-    const meaning = data.meaning
-
-    for (let index = 0; index < meaning.length; index++) {
-
-        const newMeaning = []
-        const { number1, number2, number3 } = randomNumber(index, meaning.length)
-        newMeaning.push(meaning[index])
-        newMeaning.push(meaning[number1])
-        newMeaning.push(meaning[number2])
-        newMeaning.push(meaning[number3])
-
-        const object = {
-            tuonghinh: tuonghinh[index],
-            pinyin: pinyin[index],
-            type: type[index],
-            audio: audio[index],
-            meaning: newMeaning,
-            result: meaning[index]
-        }
-
-        newData.push(object)
-    }
-
-    return newData
-}
-
-export default composeAutoFunc
-
-
-// Version 2: Optimized But Many Word same meaning
-
-// interface dataInput {
-//     tuonghinh: Array<string>,
-//     meaning: Array<string>
-// }
-
-// const getRandomNumbers = (index: number, arrLength: number): number[] => {
-//     const numbers = new Set<number>();
-
-//     while (numbers.size < 3) {
-//         const randomNum = Math.floor(Math.random() * arrLength);
-//         if (randomNum !== index) {
-//             numbers.add(randomNum);
-//         }
-//     }
-
-//     return Array.from(numbers);
-// }
-
-// const composeAutoFunc = (data: dataInput) => {
-//     const newData = [];
-
-//     const { tuonghinh, meaning } = data;
-
-//     for (let index = 0; index < tuonghinh.length; index++) {
-//         const newMeaning = [meaning[index]];
-//         const randomIndices = getRandomNumbers(index, meaning.length);
-
-//         randomIndices.forEach((randIndex) => newMeaning.push(meaning[randIndex]));
-
-//         const object = {
-//             tuonghinh: tuonghinh[index],
-//             meaning: newMeaning,
-//         };
-
-//         newData.push(object);
-//     }
-
-//     return newData;
-// }
-
-// export default composeAutoFunc;
+export default composeAutoFunc;

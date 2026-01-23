@@ -1,5 +1,4 @@
-
-import { Div } from "../../assets/styles/admin/deleteGrammar";
+import { Div } from "../../assets/styles/admin/deleteReview";
 import configDomain from "../../configs/config.domain";
 import setHeadersRequest from "../../utils/setHeadersRequest";
 import axios from "axios";
@@ -11,13 +10,14 @@ interface ChoiceBook {
     lesson: string
 }
 
-const DeleteGrammar = () => {
+const DeleteReview = () => {
 
     const domain = configDomain?.domain
     const headers = setHeadersRequest()
 
     const [isError, setIsError] = useState<boolean>(false)
     const [messageError, setMessageError] = useState<string>('')
+    const [messageSuccess, setMessageSuccess] = useState<string>('')
 
     const [choiceBook, setChoiceBook] = useState<ChoiceBook>({
         book: '',
@@ -30,37 +30,44 @@ const DeleteGrammar = () => {
         })
     }
 
-    // Get All Information Grammar
     const handleSubmitChoiceBook = () => {
 
         if (choiceBook.book == '' || choiceBook.lesson == '') {
             setIsError(true)
             setMessageError('Please Enter Book Name and Lesson')
+            setMessageSuccess('')
             return
         } else {
             setIsError(false)
         }
 
-        const deleteGrammar = async () => {
+        const confirmDelete = window.confirm('Bạn chắc chắn muốn xóa bài Ôn Tập này? Nếu không còn Từ Vựng/Ngữ Pháp thì sẽ xóa Lesson.')
+        if (!confirmDelete) return
 
-            const url = `${domain}/admin/deleteGrammar`
+        const deleteReview = async () => {
+
+            const url = `${domain}/admin/deleteComposeReview`
             try {
                 await axios.post(url, choiceBook, { headers })
                 setChoiceBook({
                     book: '',
                     lesson: ''
                 })
+                setMessageSuccess('Delete Successful')
+                setIsError(false)
+                setMessageError('')
             } catch (error: any) {
                 setIsError(true)
                 setMessageError(getAxiosErrorMessage(error))
+                setMessageSuccess('')
             }
         }
 
-        deleteGrammar()
+        deleteReview()
     }
 
     return (
-        <Div className="delete-grammar">
+        <Div className="delete-review">
             <h1 className="title">Vui Lòng Chọn Bài Cần Xóa</h1>
             <div className="choice-book">
                 <div className="book">
@@ -75,10 +82,14 @@ const DeleteGrammar = () => {
             {isError &&
                 <p className="error" style={{ color: '#527f4f', marginTop: '0', marginBottom: '22px' }}>{messageError}</p>
             }
+            {!!messageSuccess &&
+                <p className="success" style={{ marginTop: '0', marginBottom: '22px' }}>{messageSuccess}</p>
+            }
             <h1 className="submit-choice" onClick={handleSubmitChoiceBook}>Gửi</h1>
         </Div>
     )
 }
 
-export default DeleteGrammar;
+export default DeleteReview;
+
 

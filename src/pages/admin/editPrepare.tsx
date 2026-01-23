@@ -6,6 +6,7 @@ import configDomain from "../../configs/config.domain";
 import setHeadersRequest from "../../utils/setHeadersRequest";
 import { useState } from "react";
 import findWordDuplicates from "../../utils/findWordDuplicate";
+import getAxiosErrorMessage from '../../utils/getAxiosErrorMessage';
 
 interface ChoiceBook {
     book: string,
@@ -103,7 +104,7 @@ const EditPrepare = () => {
                 })
             } catch (error: any) {
                 setIsError(true)
-                setMessageError(error.response?.data.message)
+                setMessageError(getAxiosErrorMessage(error))
             }
         }
 
@@ -166,7 +167,7 @@ const EditPrepare = () => {
             setOpenPopup(false)
         } catch (error: any) {
             setIsError(true)
-            setMessageError(error.response.data.message)
+            setMessageError(getAxiosErrorMessage(error))
         }
     }
 
@@ -271,3 +272,4 @@ const EditPrepare = () => {
 }
 
 export default EditPrepare;
+

@@ -26,6 +26,8 @@ import { useCallback, useEffect, useState } from 'react'
 import configDomain from '../configs/config.domain';
 import setHeadersRequest from '../utils/setHeadersRequest';
 import axios from 'axios'
+import logger from '../utils/logger';
+import getAxiosErrorMessage from '../utils/getAxiosErrorMessage';
 
 const images: string[] = [img3, img4, img5, img6, img7, img8, img9, img10, img11, img12, img13, img14, img15, img16, img17, img18, img19, img20, img21, img22]
 
@@ -122,7 +124,7 @@ const PrivateReview = () => {
 
             setListNameCompose(data)
         } catch (error) {
-            console.log(error)
+            logger.error(error, 'getDataBook')
         }
     }
 
@@ -156,7 +158,7 @@ const PrivateReview = () => {
             setEndReview(true)
             setBookActive(idCompose)
             setIsError(true)
-            setMessageError(error.response.data.message)
+            setMessageError(getAxiosErrorMessage(error))
         }
     }
 
@@ -234,3 +236,4 @@ const PrivateReview = () => {
 }
 
 export default PrivateReview
+
