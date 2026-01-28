@@ -2,4 +2,4 @@ User-agent: *
 Disallow: /admin-gory/
 Disallow: /admin-manage-user/
 Allow: /
-Sitemap: https://gorychinese.pro/sitemap.xml
+Sitemap: https://gorychinese.online/sitemap.xml
