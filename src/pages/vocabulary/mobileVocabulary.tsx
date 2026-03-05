@@ -76,14 +76,14 @@ const MobileVocabulary = () => {
         getDataBook()
     }, [])
 
-    const showDataVocabulary = async (idBook: string, idLesson: string) => {
+    const showDataVocabulary = async (idBook: string, idLesson: string, page: number = currentPage) => {
 
         setInforLesson({ bookId: idBook, lessonId: idLesson })
 
         const url = `${domain}/general/getVocabulary`
 
         try {
-            const res = await axios.post(url, { idBook, idLesson, limit: limitPage, currentPage: currentPage })
+            const res = await axios.post(url, { idBook, idLesson, limit: limitPage, currentPage: page })
 
             const data = res.data.metadata.vocabulary
             const totalVocab = res.data.metadata.totalVocab
@@ -91,6 +91,7 @@ const MobileVocabulary = () => {
             setTotalVocab(totalVocab)
             setDataVocabulary(data)
             setChoiceBook(true)
+            setExpandedExampleIndex(null)
         } catch (error: any) {
             setChoiceBook(false)
             setIsError(true)
@@ -99,8 +100,7 @@ const MobileVocabulary = () => {
     }
 
     useEffect(() => {
-        if (choiceBook) showDataVocabulary(inforLesson.bookId, inforLesson.lessonId)
-        setExpandedExampleIndex(null)
+        if (choiceBook) showDataVocabulary(inforLesson.bookId, inforLesson.lessonId, currentPage)
     }, [currentPage])
 
     const handleFormatContent = useCallback((content: string) => {
@@ -119,7 +119,7 @@ const MobileVocabulary = () => {
 
     return (
         <Div className="container">
-            <ListBookMobile dataBook={dataBook} onLessonClick={(bookId, lessonId) => { showDataVocabulary(bookId, lessonId) }} />
+            <ListBookMobile dataBook={dataBook} onLessonClick={(bookId, lessonId) => { setCurrentPage(1); showDataVocabulary(bookId, lessonId, 1) }} />
             {choiceBook ?
                 <>
                     <div className="mainContent">
@@ -157,7 +157,7 @@ const MobileVocabulary = () => {
                         })}
                     </div>
                     {totalVocab > limitPage &&
-                        <Pagination totalDc={totalVocab} limitPage={limitPage} shareCurrentPage={shareCurrentPage} />
+                        <Pagination key={`${inforLesson.bookId}-${inforLesson.lessonId}`} totalDc={totalVocab} limitPage={limitPage} shareCurrentPage={shareCurrentPage} />
                     }
                 </>
                 :
