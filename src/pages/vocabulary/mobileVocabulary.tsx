@@ -100,6 +100,7 @@ const MobileVocabulary = () => {
 
     useEffect(() => {
         if (choiceBook) showDataVocabulary(inforLesson.bookId, inforLesson.lessonId)
+        setExpandedExampleIndex(null)
     }, [currentPage])
 
     const handleFormatContent = useCallback((content: string) => {
@@ -110,7 +111,7 @@ const MobileVocabulary = () => {
 
     const [expandedExampleIndex, setExpandedExampleIndex] = useState<number | null>(null);
 
-    const exampleContainerRef = useRef<HTMLDivElement>(null);
+    const exampleContainerRefs = useRef<(HTMLDivElement | null)[]>([]);
 
     const handleToggleExample = (index: number) => {
         setExpandedExampleIndex(prevIndex => (prevIndex === index ? null : index));
@@ -138,9 +139,9 @@ const MobileVocabulary = () => {
                                         <span>Ví dụ</span>
                                         <IonIcon name="chevron-down-outline" id='iconChevron'></IonIcon>
                                     </div>
-                                    <div className="exampleContainer" ref={exampleContainerRef} style={{
-                                        maxHeight: expandedExampleIndex === index && exampleContainerRef.current
-                                            ? `${exampleContainerRef.current.scrollHeight}px`
+                                    <div className="exampleContainer" ref={el => { exampleContainerRefs.current[index] = el }} style={{
+                                        maxHeight: expandedExampleIndex === index && exampleContainerRefs.current[index]
+                                            ? `${exampleContainerRefs.current[index]!.scrollHeight}px`
                                             : '0px'
                                     }}>
                                         <div className="example">

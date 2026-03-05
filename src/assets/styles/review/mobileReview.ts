@@ -9,13 +9,14 @@ const Div = styled.div`
         border: 1px solid #adadad;
         border-radius: 8px;
         padding: 15px 10px;
-        height: calc(100vh - 249.2px);
+        min-height: calc(100vh - 249.2px);
+        overflow-y: auto;
 
         .mainWord {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-top: 72px;
+            margin-top: 24px;
         }
 
         .tuongHinh {
@@ -28,15 +29,15 @@ const Div = styled.div`
         }
 
         .inforMainWorld {
-            margin-top: 18px;
+            margin-top: 14px;
             display: flex;
             justify-content: center;
             align-items: center;
 
             h1 {
-                font-size: 2.2rem;
-                line-height: 2.4rem;
-                margin-right: 20px;
+                font-size: 2rem;
+                line-height: 2.2rem;
+                margin-right: 16px;
             }
 
             #type {
@@ -52,48 +53,37 @@ const Div = styled.div`
         }
 
         .pinyin {
-            font-size: 3.2rem;
-            line-height: 3.5rem;
+            font-size: 2.8rem;
+            line-height: 3.1rem;
         }
 
         .listMeansWord {
-            margin-top: 56px;
-            display: flex;
-            flex-wrap: wrap;
+            margin-top: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
         }
 
         .itemMeansWord {
-
-            flex-basis: 45%;
-            margin-bottom: 75px;
             text-align: center;
-            font-size: 2.4rem;
-            line-height: 2.6rem;
-            padding: 5px 10px;
+            font-size: 2rem;
+            line-height: 2.4rem;
+            padding: 10px 8px;
             border: 1px solid #adadad;
             border-radius: 4px;
-            margin-right: 10%;
             cursor: pointer;
-        }
-
-        .itemMeansWord:nth-of-type(2) {
-            margin-right: 0;
-        }
-
-        .itemMeansWord:nth-of-type(3) {
-            margin-bottom: 0;
-        }
-
-        .itemMeansWord:nth-of-type(4) {
-            margin-right: 0;
-            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
         }
 
         .endWord {
             text-align: center;
-            margin-top: 60px;
-            font-size: 2.8rem;
-            line-height: 3.1rem;
+            margin-top: 24px;
+            margin-bottom: 10px;
+            font-size: 2.6rem;
+            line-height: 2.8rem;
             cursor: pointer;
             color: #bf2c24;
         }
